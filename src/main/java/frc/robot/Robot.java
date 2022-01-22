@@ -22,6 +22,11 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   public PlasmaJoystick joystick;
   public Drive drive;
+  public Shooter shooter;
+
+  double shooterSpeed;
+  double secondShooterSpeed;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -35,6 +40,7 @@ public class Robot extends TimedRobot {
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
     drive = new Drive(0, 1);
+    shooter = new Shooter(3,6);
     
   }
 
@@ -47,6 +53,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+
+    shooterSpeed = (double) SmartDashboard.getNumber("Front Shooter Percent Output", 0.0);
+    SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
+
+    secondShooterSpeed = (double) SmartDashboard.getNumber("Back Shooter Percent Output", 0.0);
+    SmartDashboard.putNumber("Shooter 2 Percent Output", secondShooterSpeed);
 
   }
 
@@ -95,6 +107,14 @@ public class Robot extends TimedRobot {
 
   public void driverControls(final PlasmaJoystick joystick){
     drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
+
+    if(joystick.RT.isPressed()){
+      shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
+      shooter.spinAcceleratorWheel(secondShooterSpeed); //1.0
+    }
+    else {
+      shooter.stopShooter();
+    }
   }
 
   /** This function is called once when the robot is disabled. */
