@@ -20,6 +20,9 @@ import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -33,10 +36,17 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drive extends SubsystemBase {
 
+
     public WPI_TalonFX leftDrive;
     public WPI_TalonFX rightDrive;
 
     public DifferentialDrive diffDrive;
+
+    private final AHRS navX;
+    private double gyroAngle;
+    private double gyroPitch;
+
+    public DifferentialDriveOdometry odometry;
   
 
     public Drive(final int leftDriveID, final int rightDriveID){
@@ -101,6 +111,31 @@ public class Drive extends SubsystemBase {
 
 
       diffDrive = new DifferentialDrive(leftDrive, rightDrive);
+
+
+      navX = new AHRS(SPI.Port.kMXP);
+
+      //kinematics = new DifferentialDriveKinematics(trackWidthMeters);
+      odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(0));
+      //feedForward = new SimpleMotorFeedforward(ks, kv, ka);
+    }
+    
+    public void drive(double speed, double rotation) {
+      diffDrive.arcadeDrive(speed, rotation);
+    }
+
+    public void currentLimit(final TalonFX talon) {
+      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30,0));
+    }
+
+    public void setToBrake(){
+      leftDrive.setNeutralMode(NeutralMode.Brake);
+      rightDrive.setNeutralMode(NeutralMode.Brake);
+    }
+
+    public void setToCoast(){
+      leftDrive.setNeutralMode(NeutralMode.Coast);
+      rightDrive.setNeutralMode(NeutralMode.Coast);
     }
     
     public void resetEncoders() {
@@ -138,22 +173,43 @@ public class Drive extends SubsystemBase {
       final double distance = (talon.getSelectedSensorPosition()/ (2048.0/((13.0/50.0)*(24.0/50.0)))) * 2.0 * Math.PI * Units.inchesToMeters(3);
       return distance;
     }
+
+
+    public void updateGyro() {
+      gyroAngle = navX.getYaw();
+      //gyroPitch = navX.getPitch();
+    }
+
+    public void setGyroAngle(double angle){
+      navX.setAngleAdjustment(angle);
+    }
+
+    public double getGyroAngle(){
+      updateGyro();
+      return gyroAngle;
+    }
+
+    public double getGyroPitch(){
+      updateGyro();
+      return gyroPitch;
+    }
+
+    public void zeroGyro() {
+      navX.zeroYaw();
+    }
+
+    public void changeGyroAngle(double angle){
+      navX.setAngleAdjustment(angle);
+    }
   
-    public void drive (double speed, double rotation) {
-      diffDrive.arcadeDrive(speed, rotation);
+
+    public Pose2d getPose(){
+      return odometry.getPoseMeters();
     }
 
-    public void currentLimit(final TalonFX talon) {
-      talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30,0));
+    public void resetOdometry(){
+      resetEncoders();
+    odometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), Rotation2d.fromDegrees(-1*getGyroAngle()));
     }
 
-    public void setToBrake(){
-      leftDrive.setNeutralMode(NeutralMode.Brake);
-      rightDrive.setNeutralMode(NeutralMode.Brake);
-    }
-
-    public void setToCoast(){
-      leftDrive.setNeutralMode(NeutralMode.Coast);
-      rightDrive.setNeutralMode(NeutralMode.Coast);
-    }
 }
