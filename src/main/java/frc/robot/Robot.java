@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -20,9 +22,13 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  public PlasmaJoystick joystick;
-  public Drive drive;
-  public Shooter shooter;
+  
+  PlasmaJoystick joystick;
+  Drive drive;
+  Shooter shooter;
+  Intake intake;
+
+  Compressor compressor;
 
   double shooterSpeed;
   double secondShooterSpeed;
@@ -39,8 +45,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
-    drive = new Drive(0, 1);
+    drive = new Drive(Constants.L_DRIVE_ID, Constants.R_DRIVE_ID);
     shooter = new Shooter(3,6);
+    intake = new Intake();
+
+    compressor = new Compressor(PneumaticsModuleType.REVPH);
     
   }
 
@@ -96,7 +105,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-
+    compressor.enableDigital();
   }
 
   /** This function is called periodically during operator control. */
@@ -115,6 +124,15 @@ public class Robot extends TimedRobot {
     else {
       shooter.stopShooter();
     }
+
+    if(joystick.X.isPressed()){
+      intake.extendIntake();
+    }
+    else if(joystick.Y.isPressed()){
+      intake.retractIntake();
+    }
+
+
   }
 
   /** This function is called once when the robot is disabled. */
