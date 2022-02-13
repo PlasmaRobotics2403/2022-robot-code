@@ -124,7 +124,7 @@ public class Robot extends TimedRobot {
   }
 
   public void driverControls(final PlasmaJoystick joystick){
-    //drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
+    drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
 
     if(joystick.RT.isPressed()){
       shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
