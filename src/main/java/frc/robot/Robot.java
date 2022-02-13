@@ -33,6 +33,9 @@ public class Robot extends TimedRobot {
   double shooterSpeed;
   double secondShooterSpeed;
 
+  double intakeSpeed;
+  double indexSpeed;
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -46,8 +49,8 @@ public class Robot extends TimedRobot {
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
     drive = new Drive(Constants.L_DRIVE_ID, Constants.R_DRIVE_ID);
-    shooter = new Shooter(3,6);
-    intake = new Intake();
+    shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID,Constants.SHOOTER_ACCELERATOR_MOTOR_ID);
+    intake = new Intake(Constants.INTAKE_ID, Constants.INDEX_ID);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     
@@ -64,10 +67,16 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     shooterSpeed = (double) SmartDashboard.getNumber("Front Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
+    SmartDashboard.putNumber("Front Shooter Percent Output", shooterSpeed);
 
     secondShooterSpeed = (double) SmartDashboard.getNumber("Back Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Shooter 2 Percent Output", secondShooterSpeed);
+    SmartDashboard.putNumber("Back Shooter Percent Output", secondShooterSpeed);
+
+    intakeSpeed = (double) SmartDashboard.getNumber("Intake Percent Output", 0.0);
+    SmartDashboard.putNumber("Intake Percent Output", intakeSpeed);
+
+    indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
+    SmartDashboard.putNumber("Index Percent Output", indexSpeed);
 
   }
 
@@ -115,7 +124,7 @@ public class Robot extends TimedRobot {
   }
 
   public void driverControls(final PlasmaJoystick joystick){
-    drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
+    //drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
 
     if(joystick.RT.isPressed()){
       shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
@@ -130,6 +139,15 @@ public class Robot extends TimedRobot {
     }
     else if(joystick.Y.isPressed()){
       intake.retractIntake();
+    }
+
+    if(joystick.LT.isPressed()){
+      intake.runIntake(intakeSpeed);
+      intake.runIndex(indexSpeed);
+    }
+    else{
+      intake.stopIntake();
+      intake.stopIndex();
     }
 
 

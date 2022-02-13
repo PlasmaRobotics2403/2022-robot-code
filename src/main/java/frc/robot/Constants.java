@@ -13,11 +13,16 @@ public class Constants {
 	/* MOTOR ID CONSTANTS */
 	public static final int R_DRIVE_ID = 1; // right side motor farthest from talons
 	public static final int L_DRIVE_ID = 0; // left side motor farthest from talons
+
+	public static final int INTAKE_ID = 2;
+	public static final int INDEX_ID = 3;
+
+	public static final int SHOOTER_MAIN_MOTOR_ID = 30;
+	public static final int SHOOTER_ACCELERATOR_MOTOR_ID = 31;
 	
 	/* PNUEMATIC CONSTANTS */
 	public static final int PNUEMATIC_HUB_ID = 21;
-	public static final int L_INTAKE_SOLENOID_CHANNEL = 0;
-	public static final int R_INTAKE_SOLENOID_CHANNEL = 1;
+	public static final int INTAKE_SOLENOID_CHANNEL = 0;
 	
 
 	/* DIO ID CONSTANTS */
