@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -24,9 +26,18 @@ public class Robot extends TimedRobot {
   public PlasmaJoystick joystick;
   public Drive drive;
   public Shooter shooter;
+  PlasmaJoystick joystick;
+  Drive drive;
+  Shooter shooter;
+  Intake intake;
+
+  Compressor compressor;
 
   double shooterSpeed;
   double secondShooterSpeed;
+
+  double intakeSpeed;
+  double indexSpeed;
 
 
   /**
@@ -40,8 +51,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
-    drive = new Drive(0, 1);
-    shooter = new Shooter(3,6);
+    drive = new Drive(Constants.L_DRIVE_ID, Constants.R_DRIVE_ID);
+    shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID,Constants.SHOOTER_ACCELERATOR_MOTOR_ID);
+    intake = new Intake(Constants.INTAKE_ID, Constants.INDEX_ID);
+
+    compressor = new Compressor(PneumaticsModuleType.REVPH);
     
   }
 
@@ -56,10 +70,16 @@ public class Robot extends TimedRobot {
   public void robotPeriodic() {
 
     shooterSpeed = (double) SmartDashboard.getNumber("Front Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
+    SmartDashboard.putNumber("Front Shooter Percent Output", shooterSpeed);
 
     secondShooterSpeed = (double) SmartDashboard.getNumber("Back Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Shooter 2 Percent Output", secondShooterSpeed);
+    SmartDashboard.putNumber("Back Shooter Percent Output", secondShooterSpeed);
+
+    intakeSpeed = (double) SmartDashboard.getNumber("Intake Percent Output", 0.0);
+    SmartDashboard.putNumber("Intake Percent Output", intakeSpeed);
+
+    indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
+    SmartDashboard.putNumber("Index Percent Output", indexSpeed);
 
   }
 
@@ -97,7 +117,7 @@ public class Robot extends TimedRobot {
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
-
+    compressor.enableDigital();
   }
 
   /** This function is called periodically during operator control. */
@@ -116,6 +136,24 @@ public class Robot extends TimedRobot {
     else {
       shooter.stopShooter();
     }
+
+    if(joystick.X.isPressed()){
+      intake.extendIntake();
+    }
+    else if(joystick.Y.isPressed()){
+      intake.retractIntake();
+    }
+
+    if(joystick.LT.isPressed()){
+      intake.runIntake(intakeSpeed);
+      intake.runIndex(indexSpeed);
+    }
+    else{
+      intake.stopIntake();
+      intake.stopIndex();
+    }
+
+
   }
 
   /** This function is called once when the robot is disabled. */
