@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 public class Constants {
     /* front of robot has electronics */
 	/* right & left sides from robot's perspective */
