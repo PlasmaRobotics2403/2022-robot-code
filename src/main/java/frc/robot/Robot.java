@@ -26,18 +26,15 @@ public class Robot extends TimedRobot {
   public PlasmaJoystick joystick;
   public Drive drive;
   public Shooter shooter;
-  PlasmaJoystick joystick;
-  Drive drive;
-  Shooter shooter;
-  Intake intake;
+  public Intake intake;
 
-  Compressor compressor;
+  private Compressor compressor;
 
-  double shooterSpeed;
-  double secondShooterSpeed;
+  private double shooterSpeed;
+  private double secondShooterSpeed;
 
-  double intakeSpeed;
-  double indexSpeed;
+  private double intakeSpeed;     //convert to constant after testing
+  private double indexSpeed;      //convert to constant after testing
 
 
   /**
@@ -152,8 +149,6 @@ public class Robot extends TimedRobot {
       intake.stopIntake();
       intake.stopIndex();
     }
-
-
   }
 
   /** This function is called once when the robot is disabled. */
