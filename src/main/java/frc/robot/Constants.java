@@ -1,7 +1,5 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.util.Color;
-
 public class Constants {
     /* front of robot has electronics */
 	/* right & left sides from robot's perspective */
@@ -40,7 +38,8 @@ public class Constants {
 	public static final int UNITS_PER_METER = 32848;
 
 	/* SHOOTER CONSTANTS */
-
+	public static final double FLYWHEEL_SPEED = 0.77;
+	public static final double ACCELERATOR_SPEED = 0.5;
 
 	/* INTAKE CONSTANTS */
 

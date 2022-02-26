@@ -23,18 +23,18 @@ public class Robot extends TimedRobot {
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
-  PlasmaJoystick joystick;
-  Drive drive;
-  Shooter shooter;
-  Intake intake;
+  public PlasmaJoystick joystick;
+  public Drive drive;
+  public Shooter shooter;
+  public Intake intake;
 
-  Compressor compressor;
+  private Compressor compressor;
 
-  double shooterSpeed;
-  double secondShooterSpeed;
+  private double shooterSpeed;
+  private double secondShooterSpeed;
 
-  double intakeSpeed;
-  double indexSpeed;
+  private double intakeSpeed;     //convert to constant after testing
+  private double indexSpeed;      //convert to constant after testing
 
 
   /**
@@ -149,8 +149,6 @@ public class Robot extends TimedRobot {
       intake.stopIntake();
       intake.stopIndex();
     }
-
-
   }
 
   /** This function is called once when the robot is disabled. */
