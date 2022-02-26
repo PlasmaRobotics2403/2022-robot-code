@@ -27,14 +27,17 @@ public class Robot extends TimedRobot {
   public Drive drive;
   public Shooter shooter;
   public Intake intake;
+  public Turret turret;
 
   private Compressor compressor;
 
   private double shooterSpeed;
-  private double secondShooterSpeed;
+  //dprivate double secondShooterSpeed;
 
   private double intakeSpeed;     //convert to constant after testing
-  private double indexSpeed;      //convert to constant after testing
+  private double kickerSpeed;      //convert to constant after testing
+  private double indexSpeed;
+
 
 
   /**
@@ -49,8 +52,9 @@ public class Robot extends TimedRobot {
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
     drive = new Drive(Constants.L_DRIVE_ID, Constants.L_DRIVE_SLAVE_ID, Constants.R_DRIVE_ID, Constants.R_DRIVE_SLAVE_ID);
-    shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID,Constants.SHOOTER_ACCELERATOR_MOTOR_ID);
-    intake = new Intake(Constants.INTAKE_ID, Constants.INDEX_ID);
+    shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID);
+    intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID, Constants.BACK_INDEX_SENSOR_ID);
+    turret = new Turret(Constants.TURRET_ID);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     
@@ -66,14 +70,14 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
 
-    shooterSpeed = (double) SmartDashboard.getNumber("Front Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Front Shooter Percent Output", shooterSpeed);
-
-    secondShooterSpeed = (double) SmartDashboard.getNumber("Back Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Back Shooter Percent Output", secondShooterSpeed);
+    shooterSpeed = (double) SmartDashboard.getNumber("Shooter Percent Output", 0.0);
+    SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
 
     intakeSpeed = (double) SmartDashboard.getNumber("Intake Percent Output", 0.0);
     SmartDashboard.putNumber("Intake Percent Output", intakeSpeed);
+
+    kickerSpeed = (double) SmartDashboard.getNumber("Kicker Percent Output", 0.0);
+    SmartDashboard.putNumber("Index Percent Output", kickerSpeed);
 
     indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
     SmartDashboard.putNumber("Index Percent Output", indexSpeed);
@@ -128,7 +132,7 @@ public class Robot extends TimedRobot {
 
     if(joystick.RT.isPressed()){
       shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
-      shooter.spinAcceleratorWheel(secondShooterSpeed); //1.0
+      //shooter.spinAcceleratorWheel(secondShooterSpeed); //1.0
     }
     else {
       shooter.stopShooter();
@@ -143,10 +147,17 @@ public class Robot extends TimedRobot {
 
     if(joystick.LT.isPressed()){
       intake.runIntake(intakeSpeed);
-      intake.runIndex(indexSpeed);
+      intake.runKicker(indexSpeed);
     }
     else{
       intake.stopIntake();
+      intake.stopKicker();
+    }
+
+    if(joystick.B.isPressed()){
+      intake.runIndex(indexSpeed);
+    }
+    else {
       intake.stopIndex();
     }
   }

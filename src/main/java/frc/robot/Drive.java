@@ -122,6 +122,11 @@ public class Drive extends SubsystemBase {
       rightDrive.configClosedloopRamp(0);
       rightDriveSlave.configClosedloopRamp(0);
 
+      currentLimit(leftDrive);
+      currentLimit(leftDriveSlave);
+      currentLimit(rightDrive);
+      currentLimit(rightDriveSlave);
+
       leftMotorController = new MotorControllerGroup(leftDrive, leftDriveSlave);
       rightMotorController = new MotorControllerGroup(rightDrive, rightDriveSlave);
 

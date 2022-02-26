@@ -11,9 +11,10 @@ public class Shooter {
     TalonFX mainMotor;
     TalonSRX acceleratorMotor;
 
-    public Shooter(final int mainMotorID, final int acceleratorMotorID){
+
+    public Shooter(final int mainMotorID){
         mainMotor = new TalonFX(mainMotorID);
-        acceleratorMotor = new TalonSRX(acceleratorMotorID);
+        //acceleratorMotor = new TalonSRX(acceleratorMotorID);
 
         mainMotor.setInverted(true);
         mainMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
@@ -21,15 +22,16 @@ public class Shooter {
         mainMotor.setNeutralMode(NeutralMode.Brake);
         //limitCurrent(mainMotor);
 
-        acceleratorMotor.setInverted(true);
-        acceleratorMotor.setSelectedSensorPosition(0, 0, 0);
-        acceleratorMotor.setNeutralMode(NeutralMode.Brake);
+        //acceleratorMotor.setInverted(true);
+        //acceleratorMotor.setSelectedSensorPosition(0, 0, 0);
+        //acceleratorMotor.setNeutralMode(NeutralMode.Brake);
         //limitCurrent(acceleratorMotor);
+
     }
 
     public void stopShooter(){
         mainMotor.set(ControlMode.PercentOutput, 0.0);
-        acceleratorMotor.set(ControlMode.PercentOutput, 0.0);
+        //acceleratorMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
     public void spinFlyWheel(double speed){
@@ -37,7 +39,7 @@ public class Shooter {
     }
 
     public void spinAcceleratorWheel(double speed){
-        acceleratorMotor.set(ControlMode.PercentOutput, speed);
+        //acceleratorMotor.set(ControlMode.PercentOutput, speed);
     }
 
     public void limitCurrent(final TalonFX talon){

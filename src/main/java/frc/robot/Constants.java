@@ -16,7 +16,10 @@ public class Constants {
 	
 
 	public static final int INTAKE_ID = 2;
-	public static final int INDEX_ID = 3;
+	public static final int KICKER_ID = 3;
+	public static final int INDEX_ID = 4;
+
+	public static final int TURRET_ID = 5;
 
 	public static final int SHOOTER_MAIN_MOTOR_ID = 30;
 	public static final int SHOOTER_ACCELERATOR_MOTOR_ID = 31;
@@ -27,6 +30,8 @@ public class Constants {
 	
 
 	/* DIO ID CONSTANTS */
+	public static final int FRONT_INDEX_SENSOR_ID = 0;
+	public static final int BACK_INDEX_SENSOR_ID = 1;
 	
 
 	/* DRIVETRAIN CONSTANTS */
