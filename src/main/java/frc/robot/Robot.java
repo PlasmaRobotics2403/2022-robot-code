@@ -48,7 +48,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
-    drive = new Drive(Constants.L_DRIVE_ID, Constants.R_DRIVE_ID);
+    drive = new Drive(Constants.L_DRIVE_ID, Constants.L_DRIVE_SLAVE_ID, Constants.R_DRIVE_ID, Constants.R_DRIVE_SLAVE_ID);
     shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID,Constants.SHOOTER_ACCELERATOR_MOTOR_ID);
     intake = new Intake(Constants.INTAKE_ID, Constants.INDEX_ID);
 

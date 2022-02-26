@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -38,7 +39,12 @@ public class Drive extends SubsystemBase {
 
 
     public WPI_TalonFX leftDrive;
+    public WPI_TalonFX leftDriveSlave;
     public WPI_TalonFX rightDrive;
+    public WPI_TalonFX rightDriveSlave;
+
+    public MotorControllerGroup leftMotorController;
+    public MotorControllerGroup rightMotorController;
 
     public DifferentialDrive diffDrive;
 
@@ -49,10 +55,11 @@ public class Drive extends SubsystemBase {
     public DifferentialDriveOdometry odometry;
   
 
-    public Drive(final int leftDriveID, final int rightDriveID){
+    public Drive(final int leftDriveID, final int leftDriveSlaveID, final int rightDriveID, final int rightDriveSlaveID){
       leftDrive = new WPI_TalonFX(leftDriveID);
+      leftDriveSlave = new WPI_TalonFX(leftDriveSlaveID);
       rightDrive = new WPI_TalonFX(rightDriveID);
-
+      rightDriveSlave = new WPI_TalonFX(rightDriveSlaveID);
 
       leftDrive.configFactoryDefault();
       rightDrive.configFactoryDefault();
@@ -98,19 +105,29 @@ public class Drive extends SubsystemBase {
 
 
 		  leftDrive.setInverted(false);
+      leftDriveSlave.setInverted(false);
 
 		  rightDrive.setInverted(true);
+      rightDriveSlave.setInverted(true);
 
       
       leftDrive.setNeutralMode(NeutralMode.Brake);
+      leftDriveSlave.setNeutralMode(NeutralMode.Brake);
       rightDrive.setNeutralMode(NeutralMode.Brake);
+      rightDriveSlave.setNeutralMode(NeutralMode.Brake);
 
 
       leftDrive.configClosedloopRamp(0);
+      leftDriveSlave.configClosedloopRamp(0);
       rightDrive.configClosedloopRamp(0);
+      rightDriveSlave.configClosedloopRamp(0);
+
+      leftMotorController = new MotorControllerGroup(leftDrive, leftDriveSlave);
+      rightMotorController = new MotorControllerGroup(rightDrive, rightDriveSlave);
 
 
-      diffDrive = new DifferentialDrive(leftDrive, rightDrive);
+
+      diffDrive = new DifferentialDrive(leftMotorController, rightMotorController);
 
 
       navX = new AHRS(SPI.Port.kMXP);

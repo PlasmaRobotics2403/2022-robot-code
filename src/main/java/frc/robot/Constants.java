@@ -11,8 +11,11 @@ public class Constants {
 	public static final int JOYSTICK2_PORT = 1;
 
 	/* MOTOR ID CONSTANTS */
-	public static final int R_DRIVE_ID = 1; // right side motor farthest from talons
 	public static final int L_DRIVE_ID = 0; // left side motor farthest from talons
+	public static final int L_DRIVE_SLAVE_ID = 1;
+	public static final int R_DRIVE_ID = 2; // right side motor farthest from talons
+	public static final int R_DRIVE_SLAVE_ID = 3;
+	
 
 	public static final int INTAKE_ID = 2;
 	public static final int INDEX_ID = 3;
