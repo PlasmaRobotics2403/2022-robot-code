@@ -15,9 +15,9 @@ public class Constants {
 	public static final int R_DRIVE_SLAVE_ID = 3;
 	
 
-	public static final int INTAKE_ID = 2;
-	public static final int KICKER_ID = 3;
-	public static final int INDEX_ID = 4;
+	public static final int INTAKE_ID = 4;
+	public static final int KICKER_ID = 5;
+	public static final int INDEX_ID = 6;
 
 	public static final int TURRET_ID = 5;
 
