@@ -77,7 +77,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Intake Percent Output", intakeSpeed);
 
     kickerSpeed = (double) SmartDashboard.getNumber("Kicker Percent Output", 0.0);
-    SmartDashboard.putNumber("Index Percent Output", kickerSpeed);
+    SmartDashboard.putNumber("Kicker Percent Output", kickerSpeed);
 
     indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
     SmartDashboard.putNumber("Index Percent Output", indexSpeed);
