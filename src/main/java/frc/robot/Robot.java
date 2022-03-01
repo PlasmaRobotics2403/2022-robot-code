@@ -6,7 +6,9 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.controllers.PlasmaJoystick;
@@ -30,14 +32,17 @@ public class Robot extends TimedRobot {
   public Turret turret;
 
   private Compressor compressor;
+  private PowerDistribution pdh;
 
   private double shooterSpeed;
   //dprivate double secondShooterSpeed;
 
   private double intakeSpeed;     //convert to constant after testing
-  private double kickerSpeed;      //convert to constant after testing
-  private double indexSpeed;
+  private double kickerSpeed;     //convert to constant after testing
+  private double indexSpeed;      //convert to constant after testing
 
+  private boolean isBraked;
+  private boolean clearStickyFaults;
 
 
   /**
@@ -57,7 +62,7 @@ public class Robot extends TimedRobot {
     turret = new Turret(Constants.TURRET_ID);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
-    
+    pdh = new PowerDistribution(Constants.POWER_DISTRIBUTION_HUB, ModuleType.kRev);
   }
 
   /**
@@ -82,6 +87,21 @@ public class Robot extends TimedRobot {
     indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
     SmartDashboard.putNumber("Index Percent Output", indexSpeed);
 
+    isBraked = (boolean) SmartDashboard.getBoolean("Brake Mode", false);
+    SmartDashboard.putBoolean("Brake Mode", isBraked);
+    if(isBraked) {
+      drive.setToBrake();
+    }
+    else {
+      drive.setToCoast();
+    }
+
+    clearStickyFaults = (boolean) SmartDashboard.getBoolean("Clear Sticky Faults", false);
+    SmartDashboard.putBoolean("Clear Sticky Faults", clearStickyFaults);
+    if(clearStickyFaults){
+      pdh.clearStickyFaults();
+      clearStickyFaults = false;
+    }
   }
 
   /**
