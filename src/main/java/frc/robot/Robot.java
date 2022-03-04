@@ -83,8 +83,8 @@ public class Robot extends TimedRobot {
     tv = table.getEntry("tv");
     ts = table.getEntry("ts");
 
-    table.getEntry("ledMode").setNumber(1);
-    table.getEntry("pipeline").setNumber(0);
+    //table.getEntry("ledMode").setNumber(1);
+    //table.getEntry("pipeline").setNumber(0);
   }
 
   /**
