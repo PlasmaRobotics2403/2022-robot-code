@@ -31,11 +31,14 @@ public class Constants {
 
 	/* PNUEMATIC CONSTANTS */
 	public static final int INTAKE_SOLENOID_CHANNEL = 0;
+	public static final int SHOOTER_SOLENOID_CHANNEL = 2;
+	public static final int CLIMB_SOLENOID_CHANNEL = 1;
 	
 
 	/* DIO ID CONSTANTS */
 	public static final int FRONT_INDEX_SENSOR_ID = 0;
-	public static final int BACK_INDEX_SENSOR_ID = 1;
+	public static final int MID_INDEX_SENSOR_ID = 1;
+	public static final int BACK_INDEX_SENSOR_ID = 2;
 	
 
 	/* DRIVETRAIN CONSTANTS */
@@ -57,6 +60,8 @@ public class Constants {
 
 
 	/* TURRET CONSTANTS */
+	public static final double MIN_LIMIT_DISTANCE = 0.0;
+	public static final double MAX_LIMIT_DISTANCE = 0.0;
 
 
 	/* CLIMB CONSTANTS */

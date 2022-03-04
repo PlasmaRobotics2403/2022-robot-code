@@ -18,9 +18,10 @@ public class Intake {
     TalonSRX indexMotor;
 
     DigitalInput frontIndexSensor;
+    DigitalInput midIndexSensor;
     DigitalInput backIndexSensor;
     
-    public Intake(final int intakeMotorID, final int kickerMotorID, final int indexMotorID, int frontIndexSensorID, int backIndexSensorID){
+    public Intake(final int intakeMotorID, final int kickerMotorID, final int indexMotorID, int frontIndexSensorID, int midIndexSensorID, int backIndexSensorID){
         intakeMotor = new VictorSPX(intakeMotorID);
         kickerMotor = new VictorSPX(kickerMotorID);
         indexMotor = new TalonSRX(indexMotorID);
@@ -45,6 +46,7 @@ public class Intake {
         limitCurrent(indexMotor);
 
         frontIndexSensor = new DigitalInput(frontIndexSensorID);
+        midIndexSensor = new DigitalInput(midIndexSensorID);
         backIndexSensor = new DigitalInput(backIndexSensorID);
     }
 
@@ -58,6 +60,10 @@ public class Intake {
 
     public void toggleIntake(){
         intakePiston.toggle();
+    }
+
+    public boolean getIntakePosition(){
+        return intakePiston.get();
     }
 
     public void runIntake(double speed){
@@ -96,6 +102,10 @@ public class Intake {
 
     public boolean getFrontIndexSensorState(){
         return frontIndexSensor.get();
+    }
+
+    public boolean getMidIndexSensorState(){
+        return midIndexSensor.get();
     }
 
     public boolean getBackIndexSensorState(){

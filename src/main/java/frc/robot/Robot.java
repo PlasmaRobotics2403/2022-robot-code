@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
@@ -35,14 +38,23 @@ public class Robot extends TimedRobot {
   private PowerDistribution pdh;
 
   private double shooterSpeed;
-  //dprivate double secondShooterSpeed;
 
-  private double intakeSpeed;     //convert to constant after testing
-  private double kickerSpeed;     //convert to constant after testing
   private double indexSpeed;      //convert to constant after testing
 
   private boolean isBraked;
   private boolean clearStickyFaults;
+
+  
+  NetworkTable table;
+  NetworkTableEntry tx;
+  NetworkTableEntry ty;
+  NetworkTableEntry ta;
+  NetworkTableEntry tv;
+  NetworkTableEntry ts;
+  
+  double vision_X;
+  double vision_Y;
+  double vision_Area;
 
 
   /**
@@ -58,11 +70,21 @@ public class Robot extends TimedRobot {
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
     drive = new Drive(Constants.L_DRIVE_ID, Constants.L_DRIVE_SLAVE_ID, Constants.R_DRIVE_ID, Constants.R_DRIVE_SLAVE_ID);
     shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID);
-    intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID, Constants.BACK_INDEX_SENSOR_ID);
+    intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID, Constants.MID_INDEX_SENSOR_ID, Constants.BACK_INDEX_SENSOR_ID);
     turret = new Turret(Constants.TURRET_ID);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     pdh = new PowerDistribution(Constants.POWER_DISTRIBUTION_HUB, ModuleType.kRev);
+
+    table = NetworkTableInstance.getDefault().getTable("limelight");
+    tx = table.getEntry("tx");
+    ty = table.getEntry("ty");
+    ta = table.getEntry("ta");
+    tv = table.getEntry("tv");
+    ts = table.getEntry("ts");
+
+    table.getEntry("ledMode").setNumber(1);
+    table.getEntry("pipeline").setNumber(0);
   }
 
   /**
@@ -74,15 +96,16 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotPeriodic() {
+    vision_X = tx.getDouble(0.0);
+    vision_Y = ty.getDouble(0.0);
+    vision_Area = ta.getDouble(0.0);
+
+    SmartDashboard.putNumber("LimelightX", vision_X);
+    SmartDashboard.putNumber("LimelightY", vision_Y);
+    SmartDashboard.putNumber("LimelightArea", vision_Area);
 
     shooterSpeed = (double) SmartDashboard.getNumber("Shooter Percent Output", 0.0);
     SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
-
-    intakeSpeed = (double) SmartDashboard.getNumber("Intake Percent Output", 0.0);
-    SmartDashboard.putNumber("Intake Percent Output", intakeSpeed);
-
-    kickerSpeed = (double) SmartDashboard.getNumber("Kicker Percent Output", 0.0);
-    SmartDashboard.putNumber("Kicker Percent Output", kickerSpeed);
 
     indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
     SmartDashboard.putNumber("Index Percent Output", indexSpeed);
@@ -102,6 +125,12 @@ public class Robot extends TimedRobot {
       pdh.clearStickyFaults();
       clearStickyFaults = false;
     }
+
+    SmartDashboard.putNumber("Turret Position", turret.getTurretPosition());
+
+    SmartDashboard.putBoolean("Front Index Sensor State", intake.getFrontIndexSensorState());
+    SmartDashboard.putBoolean("Mid Index Sensor State", intake.getMidIndexSensorState());
+    SmartDashboard.putBoolean("Back Index Sensor State", intake.getBackIndexSensorState());
   }
 
   /**
@@ -152,25 +181,30 @@ public class Robot extends TimedRobot {
 
     if(joystick.RT.isPressed()){
       shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
-      //shooter.spinAcceleratorWheel(secondShooterSpeed); //1.0
     }
     else {
       shooter.stopShooter();
     }
 
     if(joystick.X.isPressed()){
-      intake.extendIntake();
+      shooter.extendShooter();
     }
     else if(joystick.Y.isPressed()){
+      shooter.retractShooter();
+    }
+    if(joystick.LB.isPressed()){
+      intake.extendIntake();
+      intake.runIntake(Constants.INTAKE_SPEED);
+    }
+    else{
       intake.retractIntake();
+      intake.stopIntake();
     }
 
     if(joystick.LT.isPressed()){
-      intake.runIntake(intakeSpeed);
-      intake.runKicker(indexSpeed);
+      intake.runKicker(Constants.KICKER_SPEED);
     }
     else{
-      intake.stopIntake();
       intake.stopKicker();
     }
 

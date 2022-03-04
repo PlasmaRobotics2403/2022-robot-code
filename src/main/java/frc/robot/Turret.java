@@ -3,8 +3,19 @@ package frc.robot;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
+
 public class Turret {
     TalonSRX turretMotor;
+
+    DigitalInput minLimit;
+    DigitalInput maxLimit;
+
+    boolean isCalibrated;
+    boolean isTracking;
+
+    double targetAngle;
+    double turretOffSet;
     
     public Turret(final int turretMotorID){
         turretMotor = new TalonSRX(turretMotorID);
@@ -23,7 +34,13 @@ public class Turret {
         limitCurrent(turretMotor);
     }
 
-    
+    public void turn(double val){
+
+    }
+
+    public double getTurretPosition(){
+        return turretMotor.getSelectedSensorPosition();
+    }
 
     public void limitCurrent(final TalonSRX talon){
         talon.configPeakCurrentDuration(0, 1000);
