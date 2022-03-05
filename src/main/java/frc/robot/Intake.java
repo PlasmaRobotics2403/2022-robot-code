@@ -20,8 +20,10 @@ public class Intake {
     DigitalInput frontIndexSensor;
     DigitalInput midIndexSensor;
     DigitalInput backIndexSensor;
+
+    int advanceBall;
     
-    public Intake(final int intakeMotorID, final int kickerMotorID, final int indexMotorID, int frontIndexSensorID, int midIndexSensorID, int backIndexSensorID){
+    public Intake(final int intakeMotorID, final int kickerMotorID, final int indexMotorID, int frontIndexSensorID){
         intakeMotor = new VictorSPX(intakeMotorID);
         kickerMotor = new VictorSPX(kickerMotorID);
         indexMotor = new TalonSRX(indexMotorID);
@@ -46,8 +48,7 @@ public class Intake {
         limitCurrent(indexMotor);
 
         frontIndexSensor = new DigitalInput(frontIndexSensorID);
-        midIndexSensor = new DigitalInput(midIndexSensorID);
-        backIndexSensor = new DigitalInput(backIndexSensorID);
+        advanceBall = 0;
     }
 
     public void extendIntake(){
@@ -58,22 +59,17 @@ public class Intake {
         intakePiston.set(false);
     }
 
-    public void toggleIntake(){
-        intakePiston.toggle();
-    }
-
     public boolean getIntakePosition(){
         return intakePiston.get();
     }
 
     public void runIntake(double speed){
         intakeMotor.set(ControlMode.PercentOutput, speed);
-        //indexMotor.set(ControlMode.PercentOutput, 0.5);
     }
+
 
     public void stopIntake(){
         intakeMotor.set(ControlMode.PercentOutput, 0.0);
-        //indexMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
     public void runKicker(double speed){
@@ -84,12 +80,23 @@ public class Intake {
         kickerMotor.set(ControlMode.PercentOutput, 0.0);
     }
 
+    public void advanceBall(){
+        advanceBall ++;
+        indexMotor.set(ControlMode.Position, 600 * advanceBall);
+    }
+
     public void runIndex(double speed){
         indexMotor.set(ControlMode.PercentOutput, speed);
     }
-
     public void stopIndex(){
         indexMotor.set(ControlMode.PercentOutput, 0.0);
+    }
+    public double getIndexPosition(){
+        return indexMotor.getSelectedSensorPosition();
+    }
+    public void zeroIndexPosition(){
+        advanceBall = 0;
+        indexMotor.setSelectedSensorPosition(0, 0, 0);
     }
 
     public void limitCurrent(final TalonSRX talon){
@@ -102,14 +109,6 @@ public class Intake {
 
     public boolean getFrontIndexSensorState(){
         return frontIndexSensor.get();
-    }
-
-    public boolean getMidIndexSensorState(){
-        return midIndexSensor.get();
-    }
-
-    public boolean getBackIndexSensorState(){
-        return backIndexSensor.get();
     }
 
 

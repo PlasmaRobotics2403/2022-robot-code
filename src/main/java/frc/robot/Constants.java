@@ -60,8 +60,10 @@ public class Constants {
 
 
 	/* TURRET CONSTANTS */
-	public static final double MIN_LIMIT_DISTANCE = 0.0;
-	public static final double MAX_LIMIT_DISTANCE = 0.0;
+	public static final double MAX_LIMIT_DISTANCE = 25000; //33381
+	public static final double MIN_LIMIT_DISTANCE = -5000; //-11661
+
+	public static final int ENCODER_TICKS_PER_ROTATION = 40800;
 
 
 	/* CLIMB CONSTANTS */

@@ -18,7 +18,7 @@ public class Shooter {
     public Shooter(final int mainMotorID){
         mainMotor = new TalonFX(mainMotorID);
 
-        mainMotor.setInverted(true);
+        mainMotor.setInverted(false);
         mainMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
         mainMotor.setSelectedSensorPosition(0, 0, 0);
         mainMotor.setNeutralMode(NeutralMode.Brake);
@@ -52,11 +52,11 @@ public class Shooter {
         talon.enableCurrentLimit(true);
     }
 
-    public void extendShooter(){
+    public void extendHood(){
         shooterPiston.set(true);
     }
 
-    public void retractShooter(){
+    public void retractHood(){
         shooterPiston.set(false);
     }
 }

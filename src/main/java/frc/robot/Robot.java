@@ -33,6 +33,7 @@ public class Robot extends TimedRobot {
   public Shooter shooter;
   public Intake intake;
   public Turret turret;
+  public Climb climb;
 
   private Compressor compressor;
   private PowerDistribution pdh;
@@ -40,6 +41,8 @@ public class Robot extends TimedRobot {
   private double shooterSpeed;
 
   private double indexSpeed;      //convert to constant after testing
+  private double turretSpeed;
+  private double testTurretPosition;
 
   private boolean isBraked;
   private boolean clearStickyFaults;
@@ -56,6 +59,10 @@ public class Robot extends TimedRobot {
   double vision_Y;
   double vision_Area;
 
+  double turretTargetAngle;
+
+  //limelight angle = 90 - 48.6 = 41.4
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -70,11 +77,14 @@ public class Robot extends TimedRobot {
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
     drive = new Drive(Constants.L_DRIVE_ID, Constants.L_DRIVE_SLAVE_ID, Constants.R_DRIVE_ID, Constants.R_DRIVE_SLAVE_ID);
     shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID);
-    intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID, Constants.MID_INDEX_SENSOR_ID, Constants.BACK_INDEX_SENSOR_ID);
+    intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID);
     turret = new Turret(Constants.TURRET_ID);
+    climb = new Climb(Constants.CLIMB_ID);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     pdh = new PowerDistribution(Constants.POWER_DISTRIBUTION_HUB, ModuleType.kRev);
+
+    drive.zeroGyro();
 
     table = NetworkTableInstance.getDefault().getTable("limelight");
     tx = table.getEntry("tx");
@@ -85,6 +95,8 @@ public class Robot extends TimedRobot {
 
     //table.getEntry("ledMode").setNumber(1);
     //table.getEntry("pipeline").setNumber(0);
+
+    turretTargetAngle = 0;
   }
 
   /**
@@ -106,9 +118,15 @@ public class Robot extends TimedRobot {
 
     shooterSpeed = (double) SmartDashboard.getNumber("Shooter Percent Output", 0.0);
     SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
+    
 
     indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
     SmartDashboard.putNumber("Index Percent Output", indexSpeed);
+
+    turretSpeed = (double) SmartDashboard.getNumber("Turret Percent Output", 0.0);
+    SmartDashboard.putNumber("Turret Percent Output", turretSpeed);
+    SmartDashboard.putNumber("Turret speed", turret.getTurretSpeed());
+
 
     isBraked = (boolean) SmartDashboard.getBoolean("Brake Mode", false);
     SmartDashboard.putBoolean("Brake Mode", isBraked);
@@ -127,10 +145,16 @@ public class Robot extends TimedRobot {
     }
 
     SmartDashboard.putNumber("Turret Position", turret.getTurretPosition());
+    SmartDashboard.putNumber("Turret Angle", turret.getTurretAngle());
 
     SmartDashboard.putBoolean("Front Index Sensor State", intake.getFrontIndexSensorState());
-    SmartDashboard.putBoolean("Mid Index Sensor State", intake.getMidIndexSensorState());
-    SmartDashboard.putBoolean("Back Index Sensor State", intake.getBackIndexSensorState());
+
+    SmartDashboard.putNumber("Index Position", intake.getIndexPosition());
+
+    SmartDashboard.putNumber("gyro angle", drive.getGyroAngle());
+
+    SmartDashboard.putNumber("Turret Target Angle", turretTargetAngle);
+    
   }
 
   /**
@@ -174,12 +198,13 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls(joystick);
+    //visionControls();
   }
 
   public void driverControls(final PlasmaJoystick joystick){
     drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
 
-    if(joystick.RT.isPressed()){
+    /*if(joystick.RT.isPressed()){
       shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
     }
     else {
@@ -187,33 +212,79 @@ public class Robot extends TimedRobot {
     }
 
     if(joystick.X.isPressed()){
-      shooter.extendShooter();
+      //shooter.extendHood();
+      intake.extendIntake();
     }
     else if(joystick.Y.isPressed()){
-      shooter.retractShooter();
-    }
-    if(joystick.LB.isPressed()){
-      intake.extendIntake();
-      intake.runIntake(Constants.INTAKE_SPEED);
-    }
-    else{
+      //shooter.retractHood();
       intake.retractIntake();
-      intake.stopIntake();
     }
 
-    if(joystick.LT.isPressed()){
+
+    if(joystick.LB.isPressed()){
+      //intake.extendIntake();
+      intake.runIntake(Constants.INTAKE_SPEED);
       intake.runKicker(Constants.KICKER_SPEED);
     }
     else{
+      //intake.retractIntake();
+      intake.stopIntake();
       intake.stopKicker();
     }
 
     if(joystick.B.isPressed()){
-      intake.runIndex(indexSpeed);
+      intake.runIndex(Constants.INDEX_SPEED);
+    }
+    else if(intake.getFrontIndexSensorState() == false){
+      intake.advanceBall();
     }
     else {
       intake.stopIndex();
+    }*/
+    
+
+    
+    if(joystick.Y.isPressed()){
+      visionControls();
     }
+    else if(joystick.RB.isPressed()){
+      turret.turn(turretSpeed);
+    }
+    else if(joystick.LB.isPressed()){
+      turret.turn(-turretSpeed);
+    }
+    else{
+      turret.turn(0);
+    }
+
+    if(joystick.A.isPressed()){
+      //intake.zeroIndexPosition();
+      turret.zeroTurretPosition();
+    }
+
+
+  }
+
+  public void visionControls(){
+    if(vision_Area != 0){
+
+      double visionSpeed = 0.04 * Math.pow(Math.abs(vision_X), 0.38);
+
+      if(vision_X > 0){
+        turret.turn(visionSpeed);
+      }
+      else if(vision_X < 0){
+        turret.turn(-visionSpeed);
+      }
+      else {
+        turret.turn(0);
+      }
+    }
+    else {
+      turret.setTurretPosition(0.0);
+    }
+
+
   }
 
   /** This function is called once when the robot is disabled. */
