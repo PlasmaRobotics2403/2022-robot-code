@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -44,6 +45,8 @@ public class Intake {
         indexMotor.config_kI(0, 0.0, 300);
         indexMotor.config_kD(0, 0, 300);
         indexMotor.config_IntegralZone(0, 30, 300);
+
+        indexMotor.setNeutralMode(NeutralMode.Brake);
 
         limitCurrent(indexMotor);
 

@@ -70,6 +70,7 @@ public class Turret {
 
     }
 
+
     public double getTurretSpeed(){
         return turretMotor.getMotorOutputPercent();
     }

@@ -22,7 +22,18 @@ public class Shooter {
         mainMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 0, 0);
         mainMotor.setSelectedSensorPosition(0, 0, 0);
         mainMotor.setNeutralMode(NeutralMode.Brake);
-        //limitCurrent(mainMotor);
+        limitCurrent(mainMotor);
+
+        //mainMotor.configClosedloopRamp(0, 300);
+        //mainMotor.configOpenloopRamp(0, 300);
+        
+        mainMotor.config_kF(0, 0.057, 300);
+        mainMotor.config_kP(0, 0.55, 300);
+        mainMotor.config_kI(0, 0.0, 300);
+        mainMotor.config_kD(0, 10, 300);
+        mainMotor.config_IntegralZone(0, 0, 300);
+
+        //mainMotor.getClosedLoopError()
 
         
         shooterPiston = new Solenoid(Constants.PNUEMATIC_HUB_ID, PneumaticsModuleType.REVPH, Constants.SHOOTER_SOLENOID_CHANNEL);
@@ -34,11 +45,37 @@ public class Shooter {
     }
 
     public void spinFlyWheel(double speed){
-        mainMotor.set(ControlMode.PercentOutput, speed);
+        mainMotor.set(ControlMode.Velocity, speed);
     }
 
     public double getShooterSpeed(){
         return mainMotor.getSelectedSensorVelocity();
+    }
+
+    public void autoShoot(double distance){
+        //distance in feet
+        double speed = 0;
+        if(distance > 3.5){
+            speed = 514.29 * distance + 5471.4;
+            extendHood();
+        }
+        else if(distance > 0) {
+            speed = 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 7500;
+            retractHood();
+        }
+        mainMotor.set(ControlMode.Velocity, speed);
+    }
+
+    public double getTargetShootSpeed(double distance){
+        if(distance > 3.5){
+            return 514.29 * distance + 5471.4;
+        } 
+        else if(distance > 0){
+            return 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 7500;
+        }
+        else {
+            return 0;
+        }
     }
 
     public void limitCurrent(final TalonFX talon){

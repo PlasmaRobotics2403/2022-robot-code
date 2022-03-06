@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
 
   private double indexSpeed;      //convert to constant after testing
   private double turretSpeed;
-  private double testTurretPosition;
 
   private boolean isBraked;
   private boolean clearStickyFaults;
@@ -61,7 +60,7 @@ public class Robot extends TimedRobot {
 
   double turretTargetAngle;
 
-  //limelight angle = 90 - 48.6 = 41.4
+  double distanceFromTarget;
 
 
   /**
@@ -116,12 +115,11 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("LimelightY", vision_Y);
     SmartDashboard.putNumber("LimelightArea", vision_Area);
 
-    shooterSpeed = (double) SmartDashboard.getNumber("Shooter Percent Output", 0.0);
-    SmartDashboard.putNumber("Shooter Percent Output", shooterSpeed);
-    
+    distanceFromTarget = (((Constants.UPPER_HUB_HEIGHT - Constants.CAMERA_HEIGHT) / Math.tan(Constants.CAMERA_ANGLE*Math.PI/180 + (vision_Y)*Math.PI/180))/12 - 2);
+    SmartDashboard.putNumber("Distance from Target", distanceFromTarget);
 
-    indexSpeed = (double) SmartDashboard.getNumber("Index Percent Output", 0.0);
-    SmartDashboard.putNumber("Index Percent Output", indexSpeed);
+    shooterSpeed = (double) SmartDashboard.getNumber("Set Shooter Speed", 0.0);
+    SmartDashboard.putNumber("Set Shooter Speed", shooterSpeed);
 
     turretSpeed = (double) SmartDashboard.getNumber("Turret Percent Output", 0.0);
     SmartDashboard.putNumber("Turret Percent Output", turretSpeed);
@@ -155,6 +153,7 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Turret Target Angle", turretTargetAngle);
     
+    SmartDashboard.putNumber("Shooter Speed", shooter.getShooterSpeed());
   }
 
   /**
@@ -204,24 +203,56 @@ public class Robot extends TimedRobot {
   public void driverControls(final PlasmaJoystick joystick){
     drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
 
-    /*if(joystick.RT.isPressed()){
-      shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
+    if(joystick.RT.isPressed()){
+      //shooter.spinFlyWheel(shooterSpeed); //0.55, 0.7
+      SmartDashboard.putNumber("target speed", Math.round(shooter.getTargetShootSpeed(distanceFromTarget)));
+      if(vision_Area != 0){
+        shooter.autoShoot(distanceFromTarget);
+        double errorValue = Math.abs(shooter.getTargetShootSpeed(distanceFromTarget) - shooter.getShooterSpeed());
+        SmartDashboard.putNumber("shooter error", errorValue);
+        if(errorValue < 400){
+          intake.runIndex(Constants.INDEX_SPEED);
+        }
+        else {
+          intake.stopIndex();
+        }
+      }
+    }
+    else if(intake.getFrontIndexSensorState() == false){
+       intake.advanceBall();
     }
     else {
       shooter.stopShooter();
+      shooter.retractHood();
+      intake.stopIndex();
     }
 
-    if(joystick.X.isPressed()){
-      //shooter.extendHood();
+    // if(joystick.B.isPressed()){
+    //   intake.runIndex(Constants.INDEX_SPEED);
+    // }
+    // else if(intake.getFrontIndexSensorState() == false){
+    //   intake.advanceBall();
+    // }
+    // else {
+    //   intake.stopIndex();
+    // }
+
+    if(joystick.X.isToggledOn()){
       intake.extendIntake();
     }
-    else if(joystick.Y.isPressed()){
-      //shooter.retractHood();
+    else {
       intake.retractIntake();
     }
 
+    if(joystick.A.isToggledOn()){
+      //shooter.extendHood();
+    }
+    else {
+      //shooter.retractHood();
+    }
 
-    if(joystick.LB.isPressed()){
+
+    if(joystick.LT.isPressed()){
       //intake.extendIntake();
       intake.runIntake(Constants.INTAKE_SPEED);
       intake.runKicker(Constants.KICKER_SPEED);
@@ -231,16 +262,6 @@ public class Robot extends TimedRobot {
       intake.stopIntake();
       intake.stopKicker();
     }
-
-    if(joystick.B.isPressed()){
-      intake.runIndex(Constants.INDEX_SPEED);
-    }
-    else if(intake.getFrontIndexSensorState() == false){
-      intake.advanceBall();
-    }
-    else {
-      intake.stopIndex();
-    }*/
     
 
     
@@ -248,10 +269,10 @@ public class Robot extends TimedRobot {
       visionControls();
     }
     else if(joystick.RB.isPressed()){
-      turret.turn(turretSpeed);
+      turret.turn(Constants.TURRET_SPEED);
     }
     else if(joystick.LB.isPressed()){
-      turret.turn(-turretSpeed);
+      turret.turn(-Constants.TURRET_SPEED);
     }
     else{
       turret.turn(0);
@@ -259,25 +280,51 @@ public class Robot extends TimedRobot {
 
     if(joystick.A.isPressed()){
       //intake.zeroIndexPosition();
-      turret.zeroTurretPosition();
+      //turret.zeroTurretPosition();
     }
 
 
   }
 
   public void visionControls(){
-    if(vision_Area != 0){
+    /*if(vision_Area != 0){
 
-      double visionSpeed = 0.04 * Math.pow(Math.abs(vision_X), 0.38);
+      double visionSpeed = 0.03 * Math.pow(Math.abs(vision_X), 0.38);
 
-      if(vision_X > 0){
+      if(vision_X > 2){
         turret.turn(visionSpeed);
       }
-      else if(vision_X < 0){
+      else if(vision_X < 2){
         turret.turn(-visionSpeed);
       }
       else {
         turret.turn(0);
+      }
+    }
+    else {
+      turret.setTurretPosition(0.0);
+    }*/
+
+    
+    /*float Kp = -0.1f;
+    float min_command = 0.05f;
+    if(vision_Area != 0){
+      float steeringTurretAdust = 0;
+
+      if(vision_X > 1.0){
+        steeringTurretAdust = Kp * (float)vision_X - min_command;
+      }else if(vision_X < 1.0){
+        steeringTurretAdust = Kp * (float)vision_X + min_command;
+      }
+
+      turret.turn(steeringTurretAdust);
+
+    }*/
+
+    if(vision_Area != 0){
+      if(Math.abs(vision_X) > 10){
+        turretTargetAngle = turret.getTurretAngle()/1.03 + vision_X;
+        turret.setTurretPosition(turretTargetAngle);
       }
     }
     else {

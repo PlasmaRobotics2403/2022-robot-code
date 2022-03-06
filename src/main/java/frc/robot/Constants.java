@@ -56,13 +56,13 @@ public class Constants {
 	/* INTAKE CONSTANTS */
 	public static final double INTAKE_SPEED = 0.5;
 	public static final double KICKER_SPEED = 0.5;
-	public static final double INDEX_SPEED = 0.5;
+	public static final double INDEX_SPEED = 0.75;
 
 
 	/* TURRET CONSTANTS */
 	public static final double MAX_LIMIT_DISTANCE = 25000; //33381
 	public static final double MIN_LIMIT_DISTANCE = -5000; //-11661
-
+	public static final double TURRET_SPEED = 0.5;
 	public static final int ENCODER_TICKS_PER_ROTATION = 40800;
 
 
@@ -72,12 +72,12 @@ public class Constants {
 
 
 	/* VISION CONSTANTS */
-	public static final double CAMERA_HEIGHT = 25.5; //inches
-	public static final double CAMERA_ANGLE = 24; //degrees
-	public static final double OUTERPORT_HEIGHT = 98; // inches
-	public static final double x2_ZOOM_Y_CONVERION = 1.077;
-	public static final double LIMELIGHT_PAN = 6.468;
-	public static final double VISION_X_OFFSET = -1.5;
+	public static final double CAMERA_HEIGHT = 41.5; //inches
+	public static final double CAMERA_ANGLE = 48.6; //degrees  //limelight angle = 90 - 48.6 = 41.4
+	public static final double UPPER_HUB_HEIGHT = 104; // inches (8ft 8 in)
+	//public static final double x2_ZOOM_Y_CONVERION = 1.077;
+	//public static final double LIMELIGHT_PAN = 6.468;
+	///public static final double VISION_X_OFFSET = -1.5;
 
 	/* TALON CONFIG CONSTANTS */
 	public static final int TALON_TIMEOUT = 30;
