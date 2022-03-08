@@ -56,22 +56,10 @@ public class Shooter {
         //distance in feet
         double speed = 0;
         if(distance > 2.5){
-            // mainMotor.config_kF(0, 0.057, 300);
-            // mainMotor.config_kP(0, 0.55, 300);
-            // mainMotor.config_kI(0, 0.00, 300);
-            // mainMotor.config_kD(0, 10, 300);
-            // mainMotor.config_IntegralZone(0, 0, 300);
-
             speed = 248.57 * distance + 6216.2;
             extendHood();
         }
         else if(distance > 0) {
-            // mainMotor.config_kF(0, 0.060, 300);
-            // mainMotor.config_kP(0, 0.20, 300);
-            // mainMotor.config_kI(0, 0.000, 300);
-            // mainMotor.config_kD(0, 10, 300);
-            // mainMotor.config_IntegralZone(0, 0, 300);
-
             speed = 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 6500; //7500
             retractHood();
         }
