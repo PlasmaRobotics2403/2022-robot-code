@@ -68,7 +68,7 @@ public class Drive extends SubsystemBase {
 
       leftDrive.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 1, 0);
 		  leftDrive.setSensorPhase(true);
-		  leftDrive.configClosedloopRamp(0);
+		  //leftDrive.configClosedloopRamp(0);
 		  leftDrive.configNominalOutputForward(0, 30);
 		  leftDrive.configNominalOutputReverse(0, 30);
 		  leftDrive.configPeakOutputForward(1, 30);
@@ -83,7 +83,7 @@ public class Drive extends SubsystemBase {
       rightDrive.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor, 1, 0);
       rightDrive.configAuxPIDPolarity(true);
 		  //rightDrive.setSensorPhase(true);
-		  rightDrive.configClosedloopRamp(0);
+		  //rightDrive.configClosedloopRamp(0);
 		  rightDrive.configNominalOutputForward(0, 30);
 		  rightDrive.configNominalOutputReverse(0, 30);
 		  rightDrive.configPeakOutputForward(1, 30);

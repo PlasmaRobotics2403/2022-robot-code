@@ -85,12 +85,31 @@ public class Turret {
 
     public void setTurretPosition(double angle){
         int position = angleToEncoderPosition(angle);
+
         turretMotor.set(ControlMode.Position, position);
         SmartDashboard.putNumber("turret Target Position", angleToEncoderPosition(angle));
     }
 
     public int angleToEncoderPosition(double angle){
-        int position = (int) (angle * (Constants.ENCODER_TICKS_PER_ROTATION / 360));
+        if(angle == -90){
+            if(getTurretAngle() < 90){
+                angle = -90;
+            }
+            else{
+                angle = 270;
+            }
+        }
+
+        int position = (int) ((angle/360) * (Constants.ENCODER_TICKS_PER_ROTATION));
+
+        if(position > Constants.MAX_LIMIT_DISTANCE){
+            position -= Constants.ENCODER_TICKS_PER_ROTATION;
+
+        }
+        else if(position < Constants.MIN_LIMIT_DISTANCE){
+            position += Constants.ENCODER_TICKS_PER_ROTATION;
+        }
+
         return position;
     }
 

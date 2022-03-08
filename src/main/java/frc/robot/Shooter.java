@@ -27,9 +27,9 @@ public class Shooter {
         //mainMotor.configClosedloopRamp(0, 300);
         //mainMotor.configOpenloopRamp(0, 300);
         
-        mainMotor.config_kF(0, 0.057, 300);
-        mainMotor.config_kP(0, 0.55, 300);
-        mainMotor.config_kI(0, 0.0, 300);
+        mainMotor.config_kF(0, 0.060, 300);
+        mainMotor.config_kP(0, 0.20, 300);
+        mainMotor.config_kI(0, 0.000, 300);
         mainMotor.config_kD(0, 10, 300);
         mainMotor.config_IntegralZone(0, 0, 300);
 
@@ -55,23 +55,33 @@ public class Shooter {
     public void autoShoot(double distance){
         //distance in feet
         double speed = 0;
-        if(distance > 3.5){
-            speed = 514.29 * distance + 5471.4;
+        if(distance > 2.5){
+            mainMotor.config_kF(0, 0.057, 300);
+            mainMotor.config_kP(0, 0.55, 300);
+            mainMotor.config_kI(0, 0.00, 300);
+            mainMotor.config_kD(0, 10, 300);
+            mainMotor.config_IntegralZone(0, 0, 300);
+            speed = 248.57 * distance + 6216.2;
             extendHood();
         }
         else if(distance > 0) {
-            speed = 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 7500;
+            mainMotor.config_kF(0, 0.060, 300);
+            mainMotor.config_kP(0, 0.20, 300);
+            mainMotor.config_kI(0, 0.000, 300);
+            mainMotor.config_kD(0, 10, 300);
+            mainMotor.config_IntegralZone(0, 0, 300);
+            speed = 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 6500; //7500
             retractHood();
         }
         mainMotor.set(ControlMode.Velocity, speed);
     }
 
     public double getTargetShootSpeed(double distance){
-        if(distance > 3.5){
-            return 514.29 * distance + 5471.4;
+        if(distance > 2.5){
+            return 248.57 * distance + 6216.2; //5471.4
         } 
         else if(distance > 0){
-            return 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 7500;
+            return 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 6500; //7500
         }
         else {
             return 0;

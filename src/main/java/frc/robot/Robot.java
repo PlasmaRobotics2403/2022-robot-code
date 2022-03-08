@@ -8,12 +8,18 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.auto.modes.Basic;
+import frc.robot.auto.modes.Nothing;
+import frc.robot.auto.util.AutoMode;
+import frc.robot.auto.util.AutoModeRunner;
 import frc.robot.controllers.PlasmaJoystick;
 
 /**
@@ -29,6 +35,7 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
   public PlasmaJoystick joystick;
+  public PlasmaJoystick joystick2;
   public Drive drive;
   public Shooter shooter;
   public Intake intake;
@@ -45,7 +52,6 @@ public class Robot extends TimedRobot {
 
   private boolean isBraked;
   private boolean clearStickyFaults;
-
   
   NetworkTable table;
   NetworkTableEntry tx;
@@ -59,8 +65,15 @@ public class Robot extends TimedRobot {
   double vision_Area;
 
   double turretTargetAngle;
+  double setTurretAngle;
+  boolean settingTurretPosition;
 
   double distanceFromTarget;
+
+  AutoModeRunner autoModeRunner;
+  AutoMode[] autoModes;
+  int autoModeSelection;
+
 
 
   /**
@@ -74,6 +87,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putData("Auto choices", m_chooser);
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
+    joystick2 = new PlasmaJoystick(Constants.JOYSTICK2_PORT);
     drive = new Drive(Constants.L_DRIVE_ID, Constants.L_DRIVE_SLAVE_ID, Constants.R_DRIVE_ID, Constants.R_DRIVE_SLAVE_ID);
     shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID);
     intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID);
@@ -96,6 +110,15 @@ public class Robot extends TimedRobot {
     //table.getEntry("pipeline").setNumber(0);
 
     turretTargetAngle = 0;
+    settingTurretPosition = false;
+    
+
+    autoModeRunner = new AutoModeRunner();
+    autoModes = new AutoMode[20];
+    for(int i = 0; i < 10; i++){
+      autoModes[i] = new Nothing();
+    }
+    autoModeSelection = 0;
   }
 
   /**
@@ -115,16 +138,21 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("LimelightY", vision_Y);
     SmartDashboard.putNumber("LimelightArea", vision_Area);
 
+    autoModeSelection = (int) SmartDashboard.getNumber("Auton Mode", 0.0);
+    SmartDashboard.putNumber("Auton Mode", autoModeSelection);
+
     distanceFromTarget = (((Constants.UPPER_HUB_HEIGHT - Constants.CAMERA_HEIGHT) / Math.tan(Constants.CAMERA_ANGLE*Math.PI/180 + (vision_Y)*Math.PI/180))/12 - 2);
     SmartDashboard.putNumber("Distance from Target", distanceFromTarget);
-
-    shooterSpeed = (double) SmartDashboard.getNumber("Set Shooter Speed", 0.0);
-    SmartDashboard.putNumber("Set Shooter Speed", shooterSpeed);
 
     turretSpeed = (double) SmartDashboard.getNumber("Turret Percent Output", 0.0);
     SmartDashboard.putNumber("Turret Percent Output", turretSpeed);
     SmartDashboard.putNumber("Turret speed", turret.getTurretSpeed());
 
+    setTurretAngle = (double) SmartDashboard.getNumber("Set Turret Angle", 0.0);
+    SmartDashboard.putNumber("Set Turret Angle", setTurretAngle);
+
+    shooterSpeed = (double) SmartDashboard.getNumber("Set Shooter RPM", 0.0);
+    SmartDashboard.putNumber("Set Shooter RPM", shooterSpeed);
 
     isBraked = (boolean) SmartDashboard.getBoolean("Brake Mode", false);
     SmartDashboard.putBoolean("Brake Mode", isBraked);
@@ -168,22 +196,34 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void autonomousInit() {
-    m_autoSelected = m_chooser.getSelected();
-    // m_autoSelected = SmartDashboard.getString("Auto Selector", kDefaultAuto);
-    System.out.println("Auto selected: " + m_autoSelected);
+    DriverStation.reportWarning("starting auto", false);
+    drive.resetEncoders();
+    drive.zeroGyro();
+    drive.setToBrake();
+
+    autoModes[0] = new Nothing();
+    autoModes[1] = new Basic(drive, turret, shooter, intake, table);
+
+    table.getEntry("ledMode").setNumber(3);
+    //turret.setTurretPosition(Constants.BACK_FACING);
+
+    autoModeRunner.chooseAutoMode(autoModes[autoModeSelection]);
+    autoModeRunner.start();
   }
 
   /** This function is called periodically during autonomous. */
   @Override
   public void autonomousPeriodic() {
-    switch (m_autoSelected) {
-      case kCustomAuto:
-        // Put custom auto code here
-        break;
-      case kDefaultAuto:
-      default:
-        // Put default auto code here
-        break;
+      
+    vision_X = tx.getDouble(0.0);
+    vision_Y = ty.getDouble(0.0);
+    vision_Area = ta.getDouble(0.0);
+
+    visionTargetPosition();
+    
+
+    if(intake.getFrontIndexSensorState() == false) {
+      intake.advanceBall();
     }
   }
 
@@ -197,7 +237,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls(joystick);
-    //visionControls();
+    visionControls(joystick);
   }
 
   public void driverControls(final PlasmaJoystick joystick){
@@ -218,6 +258,9 @@ public class Robot extends TimedRobot {
         }
       }
     }
+    else if(joystick.B.isPressed()){
+       intake.runIndex(Constants.INDEX_SPEED);
+    }
     else if(intake.getFrontIndexSensorState() == false){
        intake.advanceBall();
     }
@@ -227,28 +270,11 @@ public class Robot extends TimedRobot {
       intake.stopIndex();
     }
 
-    // if(joystick.B.isPressed()){
-    //   intake.runIndex(Constants.INDEX_SPEED);
-    // }
-    // else if(intake.getFrontIndexSensorState() == false){
-    //   intake.advanceBall();
-    // }
-    // else {
-    //   intake.stopIndex();
-    // }
-
     if(joystick.X.isToggledOn()){
       intake.extendIntake();
     }
     else {
       intake.retractIntake();
-    }
-
-    if(joystick.A.isToggledOn()){
-      //shooter.extendHood();
-    }
-    else {
-      //shooter.retractHood();
     }
 
 
@@ -266,7 +292,8 @@ public class Robot extends TimedRobot {
 
     
     if(joystick.Y.isPressed()){
-      visionControls();
+      visionTargetPosition();
+      //turret.setTurretPosition(setTurretAngle);
     }
     else if(joystick.RB.isPressed()){
       turret.turn(Constants.TURRET_SPEED);
@@ -286,7 +313,7 @@ public class Robot extends TimedRobot {
 
   }
 
-  public void visionControls(){
+  public void visionTargetPosition(){
     /*if(vision_Area != 0){
 
       double visionSpeed = 0.03 * Math.pow(Math.abs(vision_X), 0.38);
@@ -302,10 +329,9 @@ public class Robot extends TimedRobot {
       }
     }
     else {
-      turret.setTurretPosition(0.0);
+      turret.turn(0.0);
     }*/
 
-    
     /*float Kp = -0.1f;
     float min_command = 0.05f;
     if(vision_Area != 0){
@@ -323,15 +349,47 @@ public class Robot extends TimedRobot {
 
     if(vision_Area != 0){
       if(Math.abs(vision_X) > 10){
-        turretTargetAngle = turret.getTurretAngle()/1.03 + vision_X;
+        turretTargetAngle = turret.getTurretAngle()/1.05 + vision_X;
         turret.setTurretPosition(turretTargetAngle);
       }
     }
     else {
-      turret.setTurretPosition(0.0);
+      turret.turn(0.0);
     }
 
+  }
 
+  public void visionControls(PlasmaJoystick joystick){
+    if(joystick.dPad.getPOV() == 0){
+      turretTargetAngle = Constants.FORWARD_FACING;
+      settingTurretPosition = true;
+    }
+    else if(joystick.dPad.getPOV() == 90){
+      turretTargetAngle = Constants.LEFT_FACING;
+      settingTurretPosition = true;
+    }
+    else if(joystick.dPad.getPOV() == 180){
+      turretTargetAngle = Constants.BACK_FACING;
+      settingTurretPosition = true;
+    }
+    else if(joystick.dPad.getPOV() == 270){
+      turretTargetAngle = Constants.RIGHT_FACING;
+      settingTurretPosition = true;
+    }
+    else if(vision_Area != 0 && settingTurretPosition == false){
+      visionTargetPosition();
+    }
+    else if(settingTurretPosition == false){
+      turret.turn(0.0);
+    }
+
+    if(settingTurretPosition == true){
+      turret.setTurretPosition(turretTargetAngle);
+      SmartDashboard.putBoolean("setting turret position", settingTurretPosition);
+      if(Math.abs(turret.getTurretAngle() - turretTargetAngle) < 1){
+        settingTurretPosition = false;
+      }
+    }
   }
 
   /** This function is called once when the robot is disabled. */
