@@ -66,6 +66,7 @@ public class Climb {
     }
 
     public void runClimb(double speed){
+        //climbMotor.set(ControlMode.PercentOutput, speed);
         if(speed > 0 && getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
             climbMotor.set(ControlMode.PercentOutput, speed);
         }
@@ -83,6 +84,14 @@ public class Climb {
 
     public double getMainClimbPosition(){
         return climbMotor.getSelectedSensorPosition();
+    }
+
+    public void runPivotMotor(double speed){
+        pivotMotor.set(ControlMode.PercentOutput, speed);
+    }
+
+    public double getPivotMotorPosition(){
+        return pivotMotor.getSelectedSensorPosition();
     }
 
     public void currentLimit(final TalonFX talon) {

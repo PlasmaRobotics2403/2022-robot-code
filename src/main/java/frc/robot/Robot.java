@@ -45,7 +45,8 @@ public class Robot extends TimedRobot {
   private Compressor compressor;
   private PowerDistribution pdh;
 
-  private double climbSpeed;    //convert to constant after testing
+  private double climbSpeed; 
+  private double pivotSpeed;   //convert to constant after testing
 
   private boolean isBraked;
   private boolean clearStickyFaults;
@@ -145,10 +146,11 @@ public class Robot extends TimedRobot {
     }
     SmartDashboard.putNumber("Distance from Target", distanceFromTarget);
 
-    SmartDashboard.putNumber("Turret speed", turret.getTurretSpeed());
-
     climbSpeed = (double) SmartDashboard.getNumber("Set Climb Speed", 0.0);
     SmartDashboard.putNumber("Set Climb Speed", climbSpeed);
+
+    pivotSpeed = (double) SmartDashboard.getNumber("Set Pivot Speed", 0.0);
+    SmartDashboard.putNumber("Set Pivot Speed", pivotSpeed);
 
     isBraked = (boolean) SmartDashboard.getBoolean("Brake Mode", false);
     SmartDashboard.putBoolean("Brake Mode", isBraked);
@@ -168,18 +170,20 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Turret Position", turret.getTurretPosition());
     SmartDashboard.putNumber("Turret Angle", turret.getTurretAngle());
+    SmartDashboard.putNumber("Turret Target Angle", turretTargetAngle);
+    SmartDashboard.putNumber("Turret speed", turret.getTurretSpeed());
 
     SmartDashboard.putBoolean("Front Index Sensor State", intake.getFrontIndexSensorState());
-
     SmartDashboard.putNumber("Index Position", intake.getIndexPosition());
 
     SmartDashboard.putNumber("gyro angle", drive.getGyroAngle());
-
-    SmartDashboard.putNumber("Turret Target Angle", turretTargetAngle);
+    SmartDashboard.putNumber("gyro pitch", drive.getGyroPitch());
+    SmartDashboard.putNumber("gyro yaw", drive.getGyroYaw());
     
     SmartDashboard.putNumber("Shooter Speed", shooter.getShooterSpeed());
 
     SmartDashboard.putNumber("Main Climb Position", climb.getMainClimbPosition());
+    SmartDashboard.putNumber("Climb Pivot Position", climb.getPivotMotorPosition());
   }
 
   /**
@@ -283,6 +287,9 @@ public class Robot extends TimedRobot {
       intake.runIntake(Constants.INTAKE_SPEED);
       intake.runKicker(Constants.KICKER_SPEED);
     }
+    else if(joystick.LB.isPressed()){
+      intake.runKicker(Constants.KICKER_SPEED);
+    }
     else{
       intake.retractIntake();
       intake.stopIntake();
@@ -291,7 +298,7 @@ public class Robot extends TimedRobot {
 
 
     if(joystick.A.isPressed()){
-      climb.runClimb(climbSpeed);
+      climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
     }
     else if(joystick.Y.isPressed()){
       climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
@@ -299,6 +306,13 @@ public class Robot extends TimedRobot {
     else {
       climb.runClimb(0.0);
     }
+
+    /*if(joystick.X.isPressed()){
+      climb.runPivotMotor(pivotSpeed);
+    }
+    else {
+      climb.runPivotMotor(0.0);
+    }*/
 
 
   }

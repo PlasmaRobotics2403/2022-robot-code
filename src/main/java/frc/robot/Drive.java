@@ -51,6 +51,7 @@ public class Drive extends SubsystemBase {
     private final AHRS navX;
     private double gyroAngle;
     private double gyroPitch;
+    private double gyroYaw;
 
     public DifferentialDriveOdometry odometry;
   
@@ -199,7 +200,8 @@ public class Drive extends SubsystemBase {
 
     public void updateGyro() {
       gyroAngle = navX.getYaw();
-      //gyroPitch = navX.getPitch();
+      gyroPitch = navX.getPitch();
+      gyroYaw = navX.getAngle();
     }
 
     public void setGyroAngle(double angle){
@@ -214,6 +216,11 @@ public class Drive extends SubsystemBase {
     public double getGyroPitch(){
       updateGyro();
       return gyroPitch;
+    }
+
+    public double getGyroYaw(){
+      updateGyro();
+      return gyroYaw;
     }
 
     public void zeroGyro() {
