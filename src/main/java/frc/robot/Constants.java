@@ -22,6 +22,7 @@ public class Constants {
 	public static final int TURRET_ID = 7;
 
 	public static final int CLIMB_ID = 8;
+	public static final int CLIMB_PIVOT_ID = 9;
 
 	public static final int SHOOTER_MAIN_MOTOR_ID = 30;
 	public static final int SHOOTER_ACCELERATOR_MOTOR_ID = 31;
@@ -50,8 +51,7 @@ public class Constants {
 	public static final int UNITS_PER_METER = 32848;
 
 	/* SHOOTER CONSTANTS */
-	public static final double BASE_FLYWHEEL_SPEED = 0.77;
-	public static final double ACCELERATOR_SPEED = 0.5;
+	public static final double LOW_SHOT_SPEED = 3000;
 
 	/* INTAKE CONSTANTS */
 	public static final double INTAKE_SPEED = 0.5;
@@ -72,7 +72,9 @@ public class Constants {
 
 
 	/* CLIMB CONSTANTS */
-	public static final double MAX_SPOOL_SPEED = .9;
+	public static final double MAX_CLIMB_SPEED = -0.75;
+	public static final double MAX_CLIMB_DISTANCE = 357226; //357226
+	public static final double MIN_CLIMB_DISTANCE = 0;
 
 
 
