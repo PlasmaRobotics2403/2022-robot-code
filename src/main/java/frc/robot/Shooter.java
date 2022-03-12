@@ -56,7 +56,7 @@ public class Shooter {
         //distance in feet
         double speed = 0;
         if(distance > 2.5){
-            speed = 248.57 * distance + 6216.2;
+            speed = 240.57 * distance + 5716.2;
             extendHood();
         }
         else if(distance > 0) {
@@ -68,7 +68,7 @@ public class Shooter {
 
     public double getTargetShootSpeed(double distance){
         if(distance > 2.5){
-            return 248.57 * distance + 6216.2; //5471.4
+            return 240.57 * distance + 5716.2; //5471.4
         } 
         else if(distance > 0){
             return 500 * Math.pow(distance, 2) - 3 * Math.pow(10, -11) * distance + 6500; //7500

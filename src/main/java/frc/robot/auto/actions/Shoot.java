@@ -43,7 +43,6 @@ public class Shoot implements Action{
     public void start() {
         ty = table.getEntry("ty");
         ta = table.getEntry("ta");
-        table.getEntry("ledMode").setNumber(3);
 
         startTime = Timer.getFPGATimestamp();
     }
@@ -56,8 +55,8 @@ public class Shoot implements Action{
         distanceFromTarget = (((Constants.UPPER_HUB_HEIGHT - Constants.CAMERA_HEIGHT) / Math.tan(Constants.CAMERA_ANGLE*Math.PI/180 + (vision_Y)*Math.PI/180))/12 - 2);
 
         if(vision_Area != 0){
-            shooter.autoShoot(distanceFromTarget);
-            double errorValue = Math.abs(shooter.getTargetShootSpeed(distanceFromTarget) - shooter.getShooterSpeed());
+            shooter.autoShoot(3);
+            double errorValue = Math.abs(shooter.getTargetShootSpeed(3) - shooter.getShooterSpeed());
             //SmartDashboard.putNumber("shooter error", errorValue);
             if(errorValue < 400){
               intake.runIndex(Constants.INDEX_SPEED);

@@ -20,9 +20,12 @@ import com.kauailabs.navx.frc.AHRS;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
@@ -31,9 +34,6 @@ import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-
-//import edu.wpi.first.wpilibj.command.Command;
 
 public class Drive extends SubsystemBase {
 
@@ -54,6 +54,8 @@ public class Drive extends SubsystemBase {
     private double gyroYaw;
 
     public DifferentialDriveOdometry odometry;
+    public DifferentialDriveKinematics kinematics;
+    public SimpleMotorFeedforward feedForward;
   
 
     public Drive(final int leftDriveID, final int leftDriveSlaveID, final int rightDriveID, final int rightDriveSlaveID){
@@ -118,10 +120,10 @@ public class Drive extends SubsystemBase {
       rightDriveSlave.setNeutralMode(NeutralMode.Brake);
 
 
-      leftDrive.configClosedloopRamp(0.2);
-      leftDriveSlave.configClosedloopRamp(0.2);
-      rightDrive.configClosedloopRamp(0.2);
-      rightDriveSlave.configClosedloopRamp(0.2);
+      leftDrive.configOpenloopRamp(0.3);
+      leftDriveSlave.configOpenloopRamp(0.3);
+      rightDrive.configOpenloopRamp(0.3);
+      rightDriveSlave.configOpenloopRamp(0.3);
 
       currentLimit(leftDrive);
       currentLimit(leftDriveSlave);
@@ -138,13 +140,13 @@ public class Drive extends SubsystemBase {
 
       navX = new AHRS(SPI.Port.kMXP);
 
-      //kinematics = new DifferentialDriveKinematics(trackWidthMeters);
+      kinematics = new DifferentialDriveKinematics(Constants.WHEEL_BASE);
       odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(0));
-      //feedForward = new SimpleMotorFeedforward(ks, kv, ka);
+      feedForward = new SimpleMotorFeedforward(0.1, 1.0, 0.2);
     }
     
     public void drive(double speed, double rotation) {
-      diffDrive.arcadeDrive(speed, rotation);
+      diffDrive.arcadeDrive(speed, rotation, true);
     }
 
     public void currentLimit(final TalonFX talon) {
@@ -232,6 +234,10 @@ public class Drive extends SubsystemBase {
     }
   
 
+    public void updateOdometry(){
+      odometry.update(Rotation2d.fromDegrees(-1*navX.getAngle()), getLeftDistance(), getRightDistance());
+    }
+
     public Pose2d getPose(){
       return odometry.getPoseMeters();
     }
@@ -240,5 +246,45 @@ public class Drive extends SubsystemBase {
       resetEncoders();
     odometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), Rotation2d.fromDegrees(-1*getGyroAngle()));
     }
+
+    public DifferentialDriveWheelSpeeds getWheelSpeeds(){
+      return new DifferentialDriveWheelSpeeds(
+          (leftDrive.getSelectedSensorVelocity()/(2048.0/((13.0/50.0)*(24.0/50.0))) * 2.0 * Math.PI * Units.inchesToMeters(3)),
+          (rightDrive.getSelectedSensorVelocity()/(2048.0/((13.0/50.0)*(24.0/50.0))) * 2.0 * Math.PI * Units.inchesToMeters(3)));
+    }
+
+    public DifferentialDriveKinematics getKinematics(){
+      return kinematics;
+    }
+
+    public SimpleMotorFeedforward getFeedforward(){
+      return feedForward;
+    }
+
+  public void setOutput(double leftVolts, double rightVolts) {
+    leftDrive.setVoltage(leftVolts);
+    leftDriveSlave.setVoltage(leftVolts);
+    rightDrive.setVoltage(rightVolts);
+    rightDriveSlave.setVoltage(rightVolts);
+    diffDrive.feed();
+
+    SmartDashboard.putNumber("left drive voltage", leftVolts);
+    SmartDashboard.putNumber("right drive voltage", rightVolts);
+  }    
+
+  public void leftWheelDrive(final double speed){
+    leftDrive.set(ControlMode.PercentOutput, speed);
+    leftDriveSlave.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void rightWheelDrive(final double speed){
+    rightDrive.set(ControlMode.PercentOutput, speed);
+    rightDriveSlave.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void autonTankDrive(final double left, final double right){
+    leftWheelDrive(left);
+    rightWheelDrive(right);
+  }
 
 }

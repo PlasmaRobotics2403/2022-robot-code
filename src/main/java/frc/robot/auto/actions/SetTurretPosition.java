@@ -15,7 +15,8 @@ public class SetTurretPosition implements Action{
 
     @Override
     public boolean isFinished() {
-        return true;
+        
+        return (Math.abs(turret.getTurretAngle() - angle) < 2) && (Math.abs(turret.getTurretSpeed()) < 0.025);
     }
 
     @Override

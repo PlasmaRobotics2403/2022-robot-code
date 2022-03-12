@@ -51,7 +51,7 @@ public class Constants {
 	public static final int UNITS_PER_METER = 32848;
 
 	/* SHOOTER CONSTANTS */
-	public static final double LOW_SHOT_SPEED = 3000;
+	public static final double LOW_SHOT_SPEED = 4000;
 
 	/* INTAKE CONSTANTS */
 	public static final double INTAKE_SPEED = 0.5;
@@ -72,7 +72,7 @@ public class Constants {
 
 
 	/* CLIMB CONSTANTS */
-	public static final double MAX_CLIMB_SPEED = -0.5;
+	public static final double MAX_CLIMB_SPEED = -0.75;
 	public static final double MAX_CLIMB_DISTANCE = 357226; //357226
 	public static final double MIN_CLIMB_DISTANCE = 0;
 	public static final double MAX_PIVOT_DISTANCE = 0; //-164425

@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.auto.modes.Basic;
+import frc.robot.auto.modes.Basic3;
 import frc.robot.auto.modes.Nothing;
 import frc.robot.auto.util.AutoMode;
 import frc.robot.auto.util.AutoModeRunner;
@@ -205,8 +206,8 @@ public class Robot extends TimedRobot {
 
     autoModes[0] = new Nothing();
     autoModes[1] = new Basic(drive, turret, shooter, intake, table);
-
-    table.getEntry("ledMode").setNumber(3);
+    autoModes[2] = new Basic3(drive, turret, shooter, intake, table);
+    //table.getEntry("ledMode").setNumber(3);
     //turret.setTurretPosition(Constants.BACK_FACING);
 
     autoModeRunner.chooseAutoMode(autoModes[autoModeSelection]);
@@ -221,18 +222,23 @@ public class Robot extends TimedRobot {
     vision_Y = ty.getDouble(0.0);
     vision_Area = ta.getDouble(0.0);
 
-    visionTargetPosition();
+    if(turret.getTurretTracking() == true){
+      visionTargetPosition();
+    }
     
 
     if(intake.getFrontIndexSensorState() == false) {
       intake.advanceBall();
     }
+
+    //drive.drive(0.15, 0);
   }
 
   /** This function is called once when teleop is enabled. */
   @Override
   public void teleopInit() {
     compressor.enableDigital();
+    turret.setTurretPosition(Constants.FORWARD_FACING);
   }
 
   /** This function is called periodically during operator control. */
@@ -243,7 +249,7 @@ public class Robot extends TimedRobot {
   }
 
   public void driverControls(final PlasmaJoystick joystick){
-    drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis());
+    drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis() * 0.7);
 
     if(joystick.RT.isPressed()){
       SmartDashboard.putNumber("target speed", Math.round(shooter.getTargetShootSpeed(distanceFromTarget)));
@@ -288,7 +294,7 @@ public class Robot extends TimedRobot {
       intake.runKicker(Constants.KICKER_SPEED);
     }
     else if(joystick.LB.isPressed()){
-      intake.runKicker(Constants.KICKER_SPEED);
+      intake.runKicker(-0.3); //Constants.KICKER_SPEED
     }
     else{
       intake.retractIntake();
@@ -352,9 +358,12 @@ public class Robot extends TimedRobot {
     }*/
 
     if(vision_Area != 0){
-      if(Math.abs(vision_X) > 10){
-        turretTargetAngle = turret.getTurretAngle()/1.05 + vision_X;
+      if(Math.abs(vision_X) > 3){
+        turretTargetAngle = turret.getTurretAngle() + vision_X/10;
         turret.setTurretPosition(turretTargetAngle);
+      }
+      else{
+        turret.turn(0.0);
       }
     }
     else {

@@ -41,7 +41,7 @@ public class Intake {
         indexMotor.configOpenloopRamp(0, 300);
 
         indexMotor.config_kF(0, 0.0, 300);
-        indexMotor.config_kP(0, 0.1, 300);
+        indexMotor.config_kP(0, 0.02, 300);
         indexMotor.config_kI(0, 0.0, 300);
         indexMotor.config_kD(0, 0, 300);
         indexMotor.config_IntegralZone(0, 30, 300);

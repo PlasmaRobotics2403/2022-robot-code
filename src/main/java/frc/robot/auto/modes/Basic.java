@@ -1,7 +1,10 @@
 package frc.robot.auto.modes;
 
+import frc.robot.auto.actions.DriveForward;
+import frc.robot.auto.actions.FollowTrajectory;
 import frc.robot.auto.actions.SetTurretPosition;
 import frc.robot.auto.actions.Shoot;
+import frc.robot.auto.actions.setTracking;
 import frc.robot.auto.util.AutoMode;
 import frc.robot.auto.util.AutoModeEndedException;
 import edu.wpi.first.networktables.NetworkTable;
@@ -21,14 +24,14 @@ import frc.robot.Turret;
  *
  */
 public class Basic extends AutoMode {
-	Drive driveTrain;
+	Drive drive;
 	Turret turret;
 	Shooter shooter;
 	Intake intake;
 	NetworkTable table;
 
-    public Basic(Drive drivetrain, Turret turret, Shooter shooter, Intake intake, NetworkTable table) {
-		this.driveTrain = drivetrain;
+    public Basic(Drive drive, Turret turret, Shooter shooter, Intake intake, NetworkTable table) {
+		this.drive = drive;
 		this.turret = turret;
 		this.shooter = shooter;
 		this.intake = intake;
@@ -42,9 +45,12 @@ public class Basic extends AutoMode {
 	@Override
 	protected void routine() throws AutoModeEndedException {
 		DriverStation.reportWarning("started Action", false);
-        runAction(new SetTurretPosition(turret, 0.0));
+		runAction(new setTracking(turret, false));
+		runAction(new SetTurretPosition(turret, Constants.BACK_FACING));
+		runAction(new setTracking(turret, true));
         runAction(new Shoot(shooter, intake, table, 3.0));
-		
+		runAction(new setTracking(turret, false));
+		runAction(new FollowTrajectory(0, drive));
 		DriverStation.reportWarning("Finished Action", false);
 	}
 

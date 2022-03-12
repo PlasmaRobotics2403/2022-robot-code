@@ -40,6 +40,8 @@ public class Turret {
         turretMotor.setInverted(true);
 
         limitCurrent(turretMotor);
+
+        isTracking = false;
     }
 
     public void turn(double turnVal){
@@ -88,6 +90,14 @@ public class Turret {
 
         turretMotor.set(ControlMode.Position, position);
         SmartDashboard.putNumber("turret Target Position", angleToEncoderPosition(angle));
+    }
+
+    public void setTurretTracking(boolean tracking){
+        isTracking = tracking;
+    }
+
+    public boolean getTurretTracking(){
+        return isTracking;
     }
 
     public int angleToEncoderPosition(double angle){
