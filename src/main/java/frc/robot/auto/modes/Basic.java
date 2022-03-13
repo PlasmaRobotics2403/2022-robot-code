@@ -48,7 +48,7 @@ public class Basic extends AutoMode {
 		runAction(new setTracking(turret, false));
 		runAction(new SetTurretPosition(turret, Constants.BACK_FACING));
 		runAction(new setTracking(turret, true));
-        runAction(new Shoot(shooter, intake, table, 3.0));
+        runAction(new Shoot(shooter, intake, table, 3.0, 3));
 		runAction(new setTracking(turret, false));
 		runAction(new FollowTrajectory(0, drive));
 		DriverStation.reportWarning("Finished Action", false);

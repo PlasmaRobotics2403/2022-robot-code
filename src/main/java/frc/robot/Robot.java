@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.auto.modes.Basic;
 import frc.robot.auto.modes.Basic3;
 import frc.robot.auto.modes.Nothing;
+import frc.robot.auto.modes.TwoBallAuto;
 import frc.robot.auto.util.AutoMode;
 import frc.robot.auto.util.AutoModeRunner;
 import frc.robot.controllers.PlasmaJoystick;
@@ -206,7 +207,7 @@ public class Robot extends TimedRobot {
 
     autoModes[0] = new Nothing();
     autoModes[1] = new Basic(drive, turret, shooter, intake, table);
-    autoModes[2] = new Basic3(drive, turret, shooter, intake, table);
+    autoModes[2] = new TwoBallAuto(drive, turret, shooter, intake, table);
     //table.getEntry("ledMode").setNumber(3);
     //turret.setTurretPosition(Constants.BACK_FACING);
 

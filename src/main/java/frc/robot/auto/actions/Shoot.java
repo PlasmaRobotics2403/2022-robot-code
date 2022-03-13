@@ -26,12 +26,13 @@ public class Shoot implements Action{
     double finishTime;
 
 
-    public Shoot(Shooter shooter, Intake intake, NetworkTable table, double finishTime ){
+    public Shoot(Shooter shooter, Intake intake, NetworkTable table, double finishTime, double distance ){
         this.shooter = shooter;
         this.intake = intake;
         this.table = table;
 
         this.finishTime = finishTime;
+        this.distanceFromTarget = distance;
     }
 
     @Override
@@ -52,11 +53,11 @@ public class Shoot implements Action{
         vision_Y = ty.getDouble(0.0);
         vision_Area = ta.getDouble(0.0);
 
-        distanceFromTarget = (((Constants.UPPER_HUB_HEIGHT - Constants.CAMERA_HEIGHT) / Math.tan(Constants.CAMERA_ANGLE*Math.PI/180 + (vision_Y)*Math.PI/180))/12 - 2);
+        //distanceFromTarget = (((Constants.UPPER_HUB_HEIGHT - Constants.CAMERA_HEIGHT) / Math.tan(Constants.CAMERA_ANGLE*Math.PI/180 + (vision_Y)*Math.PI/180))/12 - 2);
 
         if(vision_Area != 0){
-            shooter.autoShoot(3);
-            double errorValue = Math.abs(shooter.getTargetShootSpeed(3) - shooter.getShooterSpeed());
+            shooter.autoShoot(distanceFromTarget);
+            double errorValue = Math.abs(shooter.getTargetShootSpeed(distanceFromTarget) - shooter.getShooterSpeed());
             //SmartDashboard.putNumber("shooter error", errorValue);
             if(errorValue < 400){
               intake.runIndex(Constants.INDEX_SPEED);
