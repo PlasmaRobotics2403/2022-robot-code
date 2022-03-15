@@ -5,20 +5,17 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-
-import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj.Solenoid;
 
 public class Climb {
 
     TalonFX climbMotor;
     TalonFX pivotMotor; 
-    Solenoid climbPiston;
 
-    public Climb(final int climbMotorID, final int pivotMotorID){
+    Drive drive;
+
+    public Climb(final int climbMotorID, final int pivotMotorID, Drive drive){
+        this.drive = drive;
         climbMotor = new WPI_TalonFX(climbMotorID);
         pivotMotor = new WPI_TalonFX(pivotMotorID);
 
@@ -53,20 +50,10 @@ public class Climb {
 
         currentLimit(pivotMotor);
 
-        climbPiston = new Solenoid(Constants.PNUEMATIC_HUB_ID, PneumaticsModuleType.REVPH, Constants.CLIMB_SOLENOID_CHANNEL);
-
     }
 
-    public void extendArms(){
-        climbPiston.set(true);
-    }
-
-    public void retractArms(){
-        climbPiston.set(false);
-    }
 
     public void runClimb(double speed){
-        //climbMotor.set(ControlMode.PercentOutput, speed);
         if(speed > 0 && getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
             climbMotor.set(ControlMode.PercentOutput, speed);
         }
@@ -86,12 +73,38 @@ public class Climb {
         return climbMotor.getSelectedSensorPosition();
     }
 
+    public double getMainClimbSpeed(){
+        return climbMotor.getSelectedSensorVelocity();
+    }
+
     public void runPivotMotor(double speed){
         pivotMotor.set(ControlMode.PercentOutput, speed);
     }
 
     public double getPivotMotorPosition(){
         return pivotMotor.getSelectedSensorPosition();
+    }
+
+    public double getPivotMotorSpeed(){
+        return pivotMotor.getSelectedSensorVelocity();
+    }
+
+    public void maintainPitch(double angle){
+        double pitch = drive.getGyroPitch();
+        if(Math.abs(pitch - angle) > 2){
+            if(pitch > angle){
+                runPivotMotor(0.2 * (Math.abs(pitch - angle)/45));
+            }
+            else if(pitch < angle){
+                runPivotMotor(-0.2 * (Math.abs(pitch - angle)/45));
+            }
+            else {
+                runPivotMotor(0.0);
+            }
+        }
+        else {
+            runPivotMotor(0.0);
+        }
     }
 
     public void currentLimit(final TalonFX talon) {

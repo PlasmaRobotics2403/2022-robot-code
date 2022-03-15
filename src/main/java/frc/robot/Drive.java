@@ -7,10 +7,8 @@
 
 package frc.robot;
 
-import frc.robot.controllers.PlasmaAxis;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -29,7 +27,6 @@ import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -51,7 +48,6 @@ public class Drive extends SubsystemBase {
     private final AHRS navX;
     private double gyroAngle;
     private double gyroPitch;
-    private double gyroYaw;
 
     public DifferentialDriveOdometry odometry;
     public DifferentialDriveKinematics kinematics;
@@ -144,10 +140,12 @@ public class Drive extends SubsystemBase {
       odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(0));
       feedForward = new SimpleMotorFeedforward(0.1, 1.0, 0.2);
     }
+
     
     public void drive(double speed, double rotation) {
       diffDrive.arcadeDrive(speed, rotation, true);
     }
+
 
     public void currentLimit(final TalonFX talon) {
       talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30,0));
@@ -162,6 +160,7 @@ public class Drive extends SubsystemBase {
       leftDrive.setNeutralMode(NeutralMode.Coast);
       rightDrive.setNeutralMode(NeutralMode.Coast);
     }
+
     
     public void resetEncoders() {
       leftDrive.setSelectedSensorPosition(0, 0, 0);
@@ -203,7 +202,6 @@ public class Drive extends SubsystemBase {
     public void updateGyro() {
       gyroAngle = navX.getYaw();
       gyroPitch = navX.getPitch();
-      gyroYaw = navX.getAngle();
     }
 
     public void setGyroAngle(double angle){
@@ -218,11 +216,6 @@ public class Drive extends SubsystemBase {
     public double getGyroPitch(){
       updateGyro();
       return gyroPitch;
-    }
-
-    public double getGyroYaw(){
-      updateGyro();
-      return gyroYaw;
     }
 
     public void zeroGyro() {

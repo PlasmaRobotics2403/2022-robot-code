@@ -4,17 +4,16 @@
 
 package frc.robot;
 
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.auto.modes.Basic;
 import frc.robot.auto.modes.Basic3;
@@ -31,10 +30,6 @@ import frc.robot.controllers.PlasmaJoystick;
  * project.
  */
 public class Robot extends TimedRobot {
-  private static final String kDefaultAuto = "Default";
-  private static final String kCustomAuto = "My Auto";
-  private String m_autoSelected;
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
   
   public PlasmaJoystick joystick;
   public PlasmaJoystick joystick2;
@@ -73,6 +68,9 @@ public class Robot extends TimedRobot {
   AutoMode[] autoModes;
   int autoModeSelection;
 
+  int climbStage;
+  int climbLevel;
+
 
 
   /**
@@ -81,9 +79,6 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
-    m_chooser.setDefaultOption("Default Auto", kDefaultAuto);
-    m_chooser.addOption("My Auto", kCustomAuto);
-    SmartDashboard.putData("Auto choices", m_chooser);
 
     joystick = new PlasmaJoystick(Constants.JOYSTICK1_PORT);
     joystick2 = new PlasmaJoystick(Constants.JOYSTICK2_PORT);
@@ -91,7 +86,7 @@ public class Robot extends TimedRobot {
     shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID);
     intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID);
     turret = new Turret(Constants.TURRET_ID);
-    climb = new Climb(Constants.CLIMB_ID, Constants.CLIMB_PIVOT_ID);
+    climb = new Climb(Constants.CLIMB_ID, Constants.CLIMB_PIVOT_ID, drive);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     pdh = new PowerDistribution(Constants.POWER_DISTRIBUTION_HUB, ModuleType.kRev);
@@ -105,11 +100,14 @@ public class Robot extends TimedRobot {
     tv = table.getEntry("tv");
     ts = table.getEntry("ts");
 
-    //table.getEntry("ledMode").setNumber(1);
-    //table.getEntry("pipeline").setNumber(0);
+    CameraServer.startAutomaticCapture();
+
 
     turretTargetAngle = 0;
     settingTurretPosition = false;
+
+    climbStage = 0;
+    climbLevel = 0;
     
 
     autoModeRunner = new AutoModeRunner();
@@ -180,7 +178,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("gyro angle", drive.getGyroAngle());
     SmartDashboard.putNumber("gyro pitch", drive.getGyroPitch());
-    SmartDashboard.putNumber("gyro yaw", drive.getGyroYaw());
     
     SmartDashboard.putNumber("Shooter Speed", shooter.getShooterSpeed());
 
@@ -208,8 +205,7 @@ public class Robot extends TimedRobot {
     autoModes[0] = new Nothing();
     autoModes[1] = new Basic(drive, turret, shooter, intake, table);
     autoModes[2] = new TwoBallAuto(drive, turret, shooter, intake, table);
-    //table.getEntry("ledMode").setNumber(3);
-    //turret.setTurretPosition(Constants.BACK_FACING);
+    autoModes[3] = new Basic3(drive, turret, shooter, intake, table);
 
     autoModeRunner.chooseAutoMode(autoModes[autoModeSelection]);
     autoModeRunner.start();
@@ -232,7 +228,6 @@ public class Robot extends TimedRobot {
       intake.advanceBall();
     }
 
-    //drive.drive(0.15, 0);
   }
 
   /** This function is called once when teleop is enabled. */
@@ -246,7 +241,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls(joystick);
-    visionControls(joystick);
+    //visionControls(joystick);
   }
 
   public void driverControls(final PlasmaJoystick joystick){
@@ -276,9 +271,6 @@ public class Robot extends TimedRobot {
         intake.stopIndex();
       }
     }
-    else if(joystick.B.isPressed()){
-       intake.runIndex(Constants.INDEX_SPEED);
-    }
     else if(intake.getFrontIndexSensorState() == false){
        intake.advanceBall();
     }
@@ -295,7 +287,9 @@ public class Robot extends TimedRobot {
       intake.runKicker(Constants.KICKER_SPEED);
     }
     else if(joystick.LB.isPressed()){
-      intake.runKicker(-0.3); //Constants.KICKER_SPEED
+      intake.extendIntake();
+      intake.runIndex(-Constants.INTAKE_SPEED);
+      intake.runKicker(-Constants.KICKER_SPEED);
     }
     else{
       intake.retractIntake();
@@ -305,22 +299,113 @@ public class Robot extends TimedRobot {
 
 
     if(joystick.A.isPressed()){
-      climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
+      //climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
+      climb.runClimb(-0.2);
     }
     else if(joystick.Y.isPressed()){
-      climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+      //climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+      climb.runClimb(0.2);
     }
     else {
       climb.runClimb(0.0);
     }
 
-    /*if(joystick.X.isPressed()){
+    if(joystick.X.isPressed()){
       climb.runPivotMotor(pivotSpeed);
+    }
+    else if(joystick.B.isPressed()){
+      climb.runPivotMotor(-pivotSpeed);
     }
     else {
       climb.runPivotMotor(0.0);
-    }*/
+    }
 
+    /*Climb:
+      driver raises climb + gets in position
+      presses button to start autonomous climb
+      
+      climb lowers to bar (main position = 0)
+      climb raises to 1/3 distance
+      pivots to max traverse angle
+      climb raises to max distance
+      pivots to min traverse angle
+      climb lowers to 2/3 distance
+      pivots return to 0
+      climb lowers to bar
+      repeat?
+
+    */
+
+    /*switch(climbStage){
+      case 0:
+        if(joystick.Y.isPressed()){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+        }
+        else if(joystick.A.isPressed()){
+          climbStage += 1;
+        }
+        else {
+          climb.runClimb(0.0);
+        }
+        break;
+
+      case 1:
+        if(climb.getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE && climb.getMainClimbSpeed() < 2){
+          climb.runClimb(Constants.MAX_CLIMB_SPEED);
+        }
+        else {
+          climb.runClimb(0.0);
+          climbLevel += 1; // if(climbLevel < 3){climbStage += 1;}
+          climbStage += 1;
+        }
+        break;
+
+      case 2:
+        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/3){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE/3);
+        }
+        else if(drive.getGyroPitch() < Constants.MAX_TRAVERSE_ANGLE){
+          climb.maintainPitch(Constants.MAX_TRAVERSE_ANGLE);
+          climb.runClimb(0.0);
+        }
+        else {
+          climb.runClimb(0.0);
+          climb.runPivotMotor(0.0);
+          climbStage += 1;
+        }
+        break;
+
+      case 3:
+        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+          climb.maintainPitch(Constants.MAX_TRAVERSE_ANGLE);
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+        }
+        else if(drive.getGyroPitch() < Constants.MIN_TRAVERSE_ANGLE){
+          climb.maintainPitch(Constants.MIN_TRAVERSE_ANGLE);
+        }
+        else {
+          climbStage += 1;
+        }
+        break;
+
+      case 4:
+        if(climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE * 2/3){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE * 2/3);
+        }
+        else if(climb.getPivotMotorPosition() < 0){
+          climb.runPivotMotor(-0.2);
+        }
+        else{
+          climbStage += 1; //climbStage = 1;
+        }
+        break;
+
+      case 5:
+        if(climb.getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE){
+          climb.runClimb(Constants.MAX_CLIMB_SPEED);
+        }
+        break;
+    }*/
 
   }
 
@@ -346,12 +431,14 @@ public class Robot extends TimedRobot {
     /*float Kp = -0.1f;
     float min_command = 0.05f;
     if(vision_Area != 0){
-      float steeringTurretAdust = 0;
+      float headingError = -(float)vision_X;
+      float steeringTurretAdust = 0.0f;
 
-      if(vision_X > 1.0){
-        steeringTurretAdust = Kp * (float)vision_X - min_command;
-      }else if(vision_X < 1.0){
-        steeringTurretAdust = Kp * (float)vision_X + min_command;
+      if(headingError > 1.0){
+        steeringTurretAdust = Kp * headingError - min_command;
+      }
+      else if(headingError < 1.0){
+        steeringTurretAdust = Kp * headingError + min_command;
       }
 
       turret.turn(steeringTurretAdust);

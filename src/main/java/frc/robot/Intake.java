@@ -23,6 +23,7 @@ public class Intake {
     DigitalInput backIndexSensor;
 
     int advanceBall;
+    boolean isIndexing;
     
     public Intake(final int intakeMotorID, final int kickerMotorID, final int indexMotorID, int frontIndexSensorID){
         intakeMotor = new VictorSPX(intakeMotorID);
@@ -52,6 +53,7 @@ public class Intake {
 
         frontIndexSensor = new DigitalInput(frontIndexSensorID);
         advanceBall = 0;
+        isIndexing = false;
     }
 
     public void extendIntake(){
@@ -86,6 +88,15 @@ public class Intake {
     public void advanceBall(){
         advanceBall ++;
         indexMotor.set(ControlMode.Position, 600 * advanceBall);
+
+        /*if(isIndexing == false){
+            advanceBall ++;
+            isIndexing = true;
+        }
+        else if(Math.abs(indexMotor.getSelectedSensorPosition() - (600 * advanceBall)) < 100){
+            isIndexing = false;
+        }
+        indexMotor.set(ControlMode.Position, 600*advanceBall);*/
     }
 
     public void runIndex(double speed){
