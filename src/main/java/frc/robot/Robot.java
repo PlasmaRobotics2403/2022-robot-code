@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.auto.modes.Basic;
@@ -71,7 +72,8 @@ public class Robot extends TimedRobot {
   int climbStage;
   int climbLevel;
 
-
+  boolean runningIntake;
+  double momentIntakeRetracted;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -108,6 +110,9 @@ public class Robot extends TimedRobot {
 
     climbStage = 0;
     climbLevel = 0;
+
+    runningIntake = false;
+    momentIntakeRetracted = 0.0;
     
 
     autoModeRunner = new AutoModeRunner();
@@ -285,26 +290,33 @@ public class Robot extends TimedRobot {
       intake.extendIntake();
       intake.runIntake(Constants.INTAKE_SPEED);
       intake.runKicker(Constants.KICKER_SPEED);
+      momentIntakeRetracted = Timer.getFPGATimestamp();
     }
     else if(joystick.LB.isPressed()){
       intake.extendIntake();
-      intake.runIndex(-Constants.INTAKE_SPEED);
+      intake.runIntake(-Constants.INTAKE_SPEED);
       intake.runKicker(-Constants.KICKER_SPEED);
     }
     else{
+      if(Timer.getFPGATimestamp() <= momentIntakeRetracted + 1){
+        intake.runIntake(Constants.INTAKE_SPEED);
+        intake.runKicker(Constants.KICKER_SPEED);
+      }
+      else {
+        intake.stopIntake();
+        intake.stopKicker();
+      }
       intake.retractIntake();
-      intake.stopIntake();
-      intake.stopKicker();
     }
 
 
     if(joystick.A.isPressed()){
       //climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
-      climb.runClimb(-0.2);
+      climb.runClimb(-climbSpeed);
     }
     else if(joystick.Y.isPressed()){
       //climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
-      climb.runClimb(0.2);
+      climb.runClimb(climbSpeed);
     }
     else {
       climb.runClimb(0.0);

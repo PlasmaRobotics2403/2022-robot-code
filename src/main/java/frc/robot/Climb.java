@@ -54,15 +54,16 @@ public class Climb {
 
 
     public void runClimb(double speed){
-        if(speed > 0 && getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
-            climbMotor.set(ControlMode.PercentOutput, speed);
-        }
-        else if(speed < 0 && getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE){
-            climbMotor.set(ControlMode.PercentOutput, speed);
-        }
-        else{
-            climbMotor.set(ControlMode.PercentOutput, 0.0);
-        }
+        // if(speed > 0 && getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+        //     climbMotor.set(ControlMode.PercentOutput, speed);
+        // }
+        // else if(speed < 0 && getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE){
+        //     climbMotor.set(ControlMode.PercentOutput, speed);
+        // }
+        // else{
+        //     climbMotor.set(ControlMode.PercentOutput, 0.0);
+        // }
+        climbMotor.set(ControlMode.PercentOutput, speed);
     }
 
     public void setClimbPosition(double position){

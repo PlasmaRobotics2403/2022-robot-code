@@ -93,10 +93,10 @@ public class Intake {
             advanceBall ++;
             isIndexing = true;
         }
-        else if(Math.abs(indexMotor.getSelectedSensorPosition() - (600 * advanceBall)) < 100){
+        else if(Math.abs(indexMotor.getSelectedSensorPosition() - (8000 * advanceBall)) < 100){
             isIndexing = false;
         }
-        indexMotor.set(ControlMode.Position, 600*advanceBall);*/
+        indexMotor.set(ControlMode.Position, 8000*advanceBall);*/
     }
 
     public void runIndex(double speed){
