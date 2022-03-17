@@ -54,16 +54,15 @@ public class Climb {
 
 
     public void runClimb(double speed){
-        // if(speed > 0 && getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
-        //     climbMotor.set(ControlMode.PercentOutput, speed);
-        // }
-        // else if(speed < 0 && getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE){
-        //     climbMotor.set(ControlMode.PercentOutput, speed);
-        // }
-        // else{
-        //     climbMotor.set(ControlMode.PercentOutput, 0.0);
-        // }
-        climbMotor.set(ControlMode.PercentOutput, speed);
+        if(speed > 0 && getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+            climbMotor.set(ControlMode.PercentOutput, speed);
+        }
+        else if(speed < 0 && getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE){
+            climbMotor.set(ControlMode.PercentOutput, speed);
+        }
+        else{
+            climbMotor.set(ControlMode.PercentOutput, 0.0);
+        }
     }
 
     public void setClimbPosition(double position){
@@ -79,7 +78,15 @@ public class Climb {
     }
 
     public void runPivotMotor(double speed){
-        pivotMotor.set(ControlMode.PercentOutput, speed);
+        if(speed > 0 && getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE){
+            pivotMotor.set(ControlMode.PercentOutput, speed);
+        }
+        else if(speed < 0 && getPivotMotorPosition() > Constants.MIN_PIVOT_DISTANCE){
+            pivotMotor.set(ControlMode.PercentOutput, speed);
+        }
+        else{
+            pivotMotor.set(ControlMode.PercentOutput, 0.0);
+        }
     }
 
     public double getPivotMotorPosition(){

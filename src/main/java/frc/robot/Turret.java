@@ -27,7 +27,7 @@ public class Turret {
         turretMotor.setSelectedSensorPosition(0, 0, 0);
 
         turretMotor.configClosedloopRamp(0.2);
-        turretMotor.configOpenloopRamp(0);
+        turretMotor.configOpenloopRamp(0.1);
 
         turretMotor.config_kF(0, 0.0, 30);
         turretMotor.config_kP(0, 0.35, 30);

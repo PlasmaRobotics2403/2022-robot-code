@@ -55,8 +55,8 @@ public class Constants {
 
 
 	/* TURRET CONSTANTS */
-	public static final int MAX_LIMIT_DISTANCE = 30700; /////////////////////////////
-	public static final int MIN_LIMIT_DISTANCE = -10300;
+	public static final int MAX_LIMIT_DISTANCE = 30700; ///
+	public static final int MIN_LIMIT_DISTANCE = -10300; /// -10476
 	public static final double TURRET_SPEED = 0.5;
 	public static final int ENCODER_TICKS_PER_ROTATION = 40800;
 
@@ -68,9 +68,9 @@ public class Constants {
 
 	/* CLIMB CONSTANTS */
 	public static final double MAX_CLIMB_SPEED = -0.75;
-	public static final double MAX_CLIMB_DISTANCE = 357226;
-	public static final double MIN_CLIMB_DISTANCE = 0;
-	public static final double MAX_PIVOT_DISTANCE = 0; //-164425 min?
+	public static final double MAX_CLIMB_DISTANCE = 522895; // 522895
+	public static final double MIN_CLIMB_DISTANCE = 1000; /// 7000
+	public static final double MAX_PIVOT_DISTANCE = 194117; //194117
 	public static final double MIN_PIVOT_DISTANCE = 0;
 	public static final double MAX_TRAVERSE_ANGLE = -2; //gyro pitch
 	public static final double MIN_TRAVERSE_ANGLE = 0;

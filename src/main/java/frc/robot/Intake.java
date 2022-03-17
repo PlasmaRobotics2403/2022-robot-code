@@ -42,10 +42,10 @@ public class Intake {
         indexMotor.configOpenloopRamp(0, 300);
 
         indexMotor.config_kF(0, 0.0, 300);
-        indexMotor.config_kP(0, 0.02, 300);
+        indexMotor.config_kP(0, 0.02, 300); //0.02
         indexMotor.config_kI(0, 0.0, 300);
         indexMotor.config_kD(0, 0, 300);
-        indexMotor.config_IntegralZone(0, 30, 300);
+        indexMotor.config_IntegralZone(0, 30, 300); //30
 
         indexMotor.setNeutralMode(NeutralMode.Brake);
 
@@ -89,14 +89,14 @@ public class Intake {
         advanceBall ++;
         indexMotor.set(ControlMode.Position, 600 * advanceBall);
 
-        /*if(isIndexing == false){
-            advanceBall ++;
-            isIndexing = true;
-        }
-        else if(Math.abs(indexMotor.getSelectedSensorPosition() - (8000 * advanceBall)) < 100){
-            isIndexing = false;
-        }
-        indexMotor.set(ControlMode.Position, 8000*advanceBall);*/
+        // if(isIndexing == false){
+        //     advanceBall ++;
+        //     isIndexing = true;
+        // }
+        // else if(Math.abs(indexMotor.getSelectedSensorPosition() - (8000 * advanceBall)) < 100){
+        //     isIndexing = false;
+        // }
+        // indexMotor.set(ControlMode.Position, 8000*advanceBall);
     }
 
     public void runIndex(double speed){

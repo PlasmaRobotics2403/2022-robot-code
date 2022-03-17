@@ -45,18 +45,18 @@ public class Basic3 extends AutoMode {
 	@Override
 	protected void routine() throws AutoModeEndedException {
 		DriverStation.reportWarning("started Action", false);
-		runAction(new setTracking(turret, false));
-		runAction(new SetTurretPosition(turret, Constants.BACK_FACING));
+		// runAction(new setTracking(turret, false));
+		// runAction(new SetTurretPosition(turret, Constants.BACK_FACING));
 		runAction(new setTracking(turret, true));
-		runAction(new Shoot(shooter, intake, table, 3.0, 3));
-		runAction(new RunIntake(intake, true));
-		DriverStation.reportWarning("extended intake", false);
-		runAction(new FollowTrajectory(0, drive));
-		runAction(new RunIntake(intake, false));
-		runAction(new FollowTrajectory(1, drive));
-		runAction(new setTracking(turret, true));
-		runAction(new Shoot(shooter, intake, table, 3.0, 3));
-		runAction(new setTracking(turret, false));
+		runAction(new Shoot(shooter, intake, table, 2.0, 3));
+		//runAction(new RunIntake(intake, true));
+		// DriverStation.reportWarning("extended intake", false);
+		// runAction(new FollowTrajectory(0, drive));
+		// runAction(new RunIntake(intake, false));
+		//runAction(new FollowTrajectory(1, drive));
+		// runAction(new setTracking(turret, true));
+		// runAction(new Shoot(shooter, intake, table, 3.0, 3));
+		// runAction(new setTracking(turret, false));
 
 		DriverStation.reportWarning("Finished Action", false);
 	}
