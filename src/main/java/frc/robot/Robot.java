@@ -193,7 +193,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Climb Pivot Position", climb.getPivotMotorPosition());
 
 
-    SmartDashboard.putNumber("Drive Distance", drive.getDistance());
+    //drive.updateOdometry();
+    SmartDashboard.putNumber("Pose X Test", drive.testX());
+    SmartDashboard.putNumber("Pose Y Test", drive.testY());
   }
 
   /**
@@ -252,7 +254,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     driverControls(joystick);
-    //visionControls(joystick);
+    visionControls(joystick);
   }
 
   public void driverControls(final PlasmaJoystick joystick){
@@ -317,36 +319,26 @@ public class Robot extends TimedRobot {
 
 
     if(joystick.A.isPressed()){
-      //climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
-      climb.runClimb(-climbSpeed);
+      climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
+      //climb.runClimb(-climbSpeed);
     }
     else if(joystick.Y.isPressed()){
-      //climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
-      climb.runClimb(climbSpeed);
+      climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+      //climb.runClimb(climbSpeed);
     }
     else {
       climb.runClimb(0.0);
     }
 
     if(joystick.X.isPressed()){
-      climb.runPivotMotor(pivotSpeed);
+      climb.runPivotMotor(0.2); //pivotSpeed
     }
     else if(joystick.B.isPressed()){
-      climb.runPivotMotor(-pivotSpeed);
+      climb.runPivotMotor(-0.2); //pivotSpeed
     }
     else {
       climb.runPivotMotor(0.0);
     }
-
-    // if(joystick.LB.isPressed()){
-    //   turret.turn(0.2);
-    // }
-    // else if(joystick.RB.isPressed()){
-    //   turret.turn(-0.2);
-    // }
-    // else{
-    //   turret.turn(0.0);
-    // }
 
     /*Climb:
       driver raises climb + gets in position
@@ -456,54 +448,36 @@ public class Robot extends TimedRobot {
       turret.turn(0.0);
     }*/
 
-    float Kp = -0.006f;
-    float min_command = 0.03f;
-    if(vision_Area != 0){
-      float headingError = -(float)vision_X;
-      float steeringTurretAdust = 0.0f;
+    // float Kp = -0.006f;
+    // float min_command = 0.03f;
+    // if(vision_Area != 0){
+    //   float headingError = -(float)vision_X;
+    //   float steeringTurretAdust = 0.0f;
 
-      if(headingError > 1.0){
-        steeringTurretAdust = Kp * headingError - min_command;
-      }
-      else if(headingError < 1.0){
-        steeringTurretAdust = Kp * headingError + min_command;
-      }
-
-      turret.turn(steeringTurretAdust);
-    }
-
-    /*if(vision_Area != 0){
-      turretTargetAngle = turret.getTurretAngle() + vision_X/10 + drive.getGyroAngle();
-      searching = 0;
-    //   if(Math.abs(vision_X) > 3){
-    //     turretTargetAngle = turret.getTurretAngle() + vision_X/10 + drive.getGyroAngle();
-    //     turret.setTurretPosition(turretTargetAngle);
+    //   if(headingError > 1.0){
+    //     steeringTurretAdust = Kp * headingError - min_command;
     //   }
-    //   else{
-    //     turret.turn(0.0);
+    //   else if(headingError < 1.0){
+    //     steeringTurretAdust = Kp * headingError + min_command;
     //   }
+
+    //   turret.turn(steeringTurretAdust);
     // }
-    // else {
-    //   turret.turn(0.0);
+
+    if(vision_Area != 0){
+      turretTargetAngle = turret.getTurretAngle() + vision_X/10;
+      if(Math.abs(vision_X) > 3){
+        turretTargetAngle = turret.getTurretAngle() + vision_X/10;
+        turret.setTurretPosition(turretTargetAngle);
+      }
+      else{
+        turret.turn(0.0);
+      }
     }
     else {
-      if(joystick.LeftY.getFilteredAxis() > 0){
-        if(turretTargetAngle > 0 && turretTargetAngle < 180){
-          searching += 1;
-        }
-        else if(turretTargetAngle < 0 || turretTargetAngle > 180){
-          searching -= 1;
-        }
-      }
-      else if(joystick.LeftY.getFilteredAxis() < 0){
-        if(turretTargetAngle > 0 && turretTargetAngle < 180){
-          searching -= 1;
-        }
-        else if(turretTargetAngle < 0 || turretTargetAngle > 180){
-          searching += 1;
-        }
-      }
-    }*/
+      turret.turn(0.0);
+    }
+    
 
   }
 
@@ -524,10 +498,6 @@ public class Robot extends TimedRobot {
       turretTargetAngle = Constants.RIGHT_FACING;
       settingTurretPosition = true;
     }
-    // else if(joystick.Y.isPressed()){
-    //   visionTargetPosition();
-    //   turret.setTurretPosition(turretTargetAngle - drive.getGyroAngle() + searching);// - drive.getGyroAngle());
-    // }
     else if(vision_Area != 0 && settingTurretPosition == false){
       visionTargetPosition();
     }

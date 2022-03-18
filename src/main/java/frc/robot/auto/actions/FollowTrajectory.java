@@ -77,8 +77,8 @@ public class FollowTrajectory  implements Action{
             List.of(
                 new Translation2d(0.6, 0)
             ),
-            // end position
-            new Pose2d(1.2192, 0, new Rotation2d(0)),
+            // end position 1.2192, 1.016
+            new Pose2d(1.016, 0, new Rotation2d(0)),
             config0);
 
 
@@ -98,7 +98,7 @@ public class FollowTrajectory  implements Action{
                 new Translation2d(-0.6, 0)
             ),
             // end position
-            new Pose2d(-1.2192, 0, new Rotation2d(0)),
+            new Pose2d(-1.016, 0, new Rotation2d(0)),
             config1);
 
         trajectoryArray = new Trajectory[5];

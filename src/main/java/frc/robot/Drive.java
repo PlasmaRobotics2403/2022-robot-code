@@ -235,6 +235,14 @@ public class Drive extends SubsystemBase {
       return odometry.getPoseMeters();
     }
 
+    public double testX(){
+      return getPose().getX();
+    }
+
+    public double testY(){
+      return getPose().getY();
+    }
+
     public void resetOdometry(){
       resetEncoders();
     odometry.resetPosition(new Pose2d(0, 0, new Rotation2d(0)), Rotation2d.fromDegrees(-1*getGyroAngle()));

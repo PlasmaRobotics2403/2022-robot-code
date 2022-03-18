@@ -68,9 +68,9 @@ public class Constants {
 
 	/* CLIMB CONSTANTS */
 	public static final double MAX_CLIMB_SPEED = -0.75;
-	public static final double MAX_CLIMB_DISTANCE = 522895; // 522895
+	public static final double MAX_CLIMB_DISTANCE = 492474; // 522895
 	public static final double MIN_CLIMB_DISTANCE = 1000; /// 7000
-	public static final double MAX_PIVOT_DISTANCE = 194117; //194117
+	public static final double MAX_PIVOT_DISTANCE = 160183; //194117
 	public static final double MIN_PIVOT_DISTANCE = 0;
 	public static final double MAX_TRAVERSE_ANGLE = -2; //gyro pitch
 	public static final double MIN_TRAVERSE_ANGLE = 0;
