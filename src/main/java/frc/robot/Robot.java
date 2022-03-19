@@ -260,7 +260,20 @@ public class Robot extends TimedRobot {
   public void driverControls(final PlasmaJoystick joystick){
     drive.drive(joystick.LeftY.getFilteredAxis(), joystick.RightX.getFilteredAxis() * 0.7);
 
-    if(joystick.RT.isPressed()){
+    if(joystick.LT.isPressed()){
+      intake.extendIntake();
+      intake.runIntake(Constants.INTAKE_SPEED);
+      intake.runKicker(Constants.KICKER_SPEED);
+      momentIntakeRetracted = Timer.getFPGATimestamp();
+
+      if(intake.getFrontIndexSensorState() == false){
+        intake.advanceBall();
+      }
+      else {
+        intake.stopIndex();
+      }
+    }
+    else if(joystick.RT.isPressed()){
       SmartDashboard.putNumber("target speed", Math.round(shooter.getTargetShootSpeed(distanceFromTarget)));
       if(vision_Area != 0){
         shooter.autoShoot(distanceFromTarget);
@@ -284,26 +297,16 @@ public class Robot extends TimedRobot {
         intake.stopIndex();
       }
     }
-    else if(intake.getFrontIndexSensorState() == false){
-       intake.advanceBall();
-    }
-    else {
-      shooter.stopShooter();
-      shooter.retractHood();
-      intake.stopIndex();
-    }
-
-
-    if(joystick.LT.isPressed()){
-      intake.extendIntake();
-      intake.runIntake(Constants.INTAKE_SPEED);
-      intake.runKicker(Constants.KICKER_SPEED);
-      momentIntakeRetracted = Timer.getFPGATimestamp();
-    }
     else if(joystick.LB.isPressed()){
       intake.extendIntake();
       intake.runIntake(-Constants.INTAKE_SPEED);
       intake.runKicker(-Constants.KICKER_SPEED);
+    }
+    else if(joystick.BACK.isPressed()){
+      intake.extendIntake();
+      intake.runIntake(-Constants.INTAKE_SPEED);
+      intake.runKicker(-Constants.KICKER_SPEED);
+      intake.runIndex(-Constants.INDEX_SPEED);
     }
     else{
       if(Timer.getFPGATimestamp() <= momentIntakeRetracted + 1){
@@ -314,7 +317,17 @@ public class Robot extends TimedRobot {
         intake.stopIntake();
         intake.stopKicker();
       }
+
+      if(intake.getFrontIndexSensorState() == false){
+        intake.advanceBall();
+      }
+      else {
+        intake.stopIndex();
+      }
+
       intake.retractIntake();
+      shooter.stopShooter();
+      shooter.retractHood();
     }
 
 

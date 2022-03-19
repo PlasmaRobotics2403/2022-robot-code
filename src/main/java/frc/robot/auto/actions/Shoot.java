@@ -61,9 +61,11 @@ public class Shoot implements Action{
             //SmartDashboard.putNumber("shooter error", errorValue);
             if(errorValue < 400){
               intake.runIndex(Constants.INDEX_SPEED);
+              intake.runKicker(Constants.KICKER_SPEED);
             }
             else {
               intake.stopIndex();
+              intake.stopKicker();
             }
         }
 
@@ -73,6 +75,7 @@ public class Shoot implements Action{
         shooter.stopShooter();
         shooter.retractHood();
         intake.stopIndex();
+        intake.stopKicker();
         DriverStation.reportWarning("done", false);
     }
 }
