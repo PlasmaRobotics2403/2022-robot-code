@@ -193,7 +193,7 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Climb Pivot Position", climb.getPivotMotorPosition());
 
 
-    //drive.updateOdometry();
+    drive.updateOdometry();
     SmartDashboard.putNumber("Pose X Test", drive.testX());
     SmartDashboard.putNumber("Pose Y Test", drive.testY());
   }
@@ -333,11 +333,9 @@ public class Robot extends TimedRobot {
 
     if(joystick.A.isPressed()){
       climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
-      //climb.runClimb(-climbSpeed);
     }
     else if(joystick.Y.isPressed()){
       climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
-      //climb.runClimb(climbSpeed);
     }
     else {
       climb.runClimb(0.0);
@@ -375,67 +373,54 @@ public class Robot extends TimedRobot {
           climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
         }
         else if(joystick.A.isPressed()){
-          climbStage += 1;
+          climb.runClimb(Constants.MAX_CLIMB_SPEED);
         }
         else {
           climb.runClimb(0.0);
+        }
+
+        if(joystick.START.isPressed()){ //add constraint for mainClimbPosition?
+          climbStage = 1;
         }
         break;
 
       case 1:
-        if(climb.getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE && climb.getMainClimbSpeed() < 2){
-          climb.runClimb(Constants.MAX_CLIMB_SPEED);
-        }
-        else {
-          climb.runClimb(0.0);
-          climbLevel += 1; // if(climbLevel < 3){climbStage += 1;}
-          climbStage += 1;
-        }
-        break;
+        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE); //add if statement for pivotMotorPosition?
 
-      case 2:
-        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/3){
-          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE/3);
-        }
-        else if(drive.getGyroPitch() < Constants.MAX_TRAVERSE_ANGLE){
-          climb.maintainPitch(Constants.MAX_TRAVERSE_ANGLE);
-          climb.runClimb(0.0);
+          if(climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE/4 && climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE){
+            climb.runPivotMotor(0.2);
+          }
         }
         else {
           climb.runClimb(0.0);
           climb.runPivotMotor(0.0);
-          climbStage += 1;
+          climbStage = 2;
         }
         break;
 
-      case 3:
-        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
-          climb.maintainPitch(Constants.MAX_TRAVERSE_ANGLE);
-          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
-        }
-        else if(drive.getGyroPitch() < Constants.MIN_TRAVERSE_ANGLE){
-          climb.maintainPitch(Constants.MIN_TRAVERSE_ANGLE);
-        }
-        else {
-          climbStage += 1;
-        }
-        break;
-
-      case 4:
-        if(climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE * 2/3){
-          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE * 2/3);
-        }
-        else if(climb.getPivotMotorPosition() < 0){
+      case 2:
+        if(drive.getGyroPitch() > -32.0 && climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE * 3/4){
           climb.runPivotMotor(-0.2);
         }
-        else{
-          climbStage += 1; //climbStage = 1;
-        }
-        break;
+        else {
+          if(joystick.A.isPressed()){ //add constraint for pivotMotorPosition?
+            climb.runClimb(Constants.MAX_CLIMB_SPEED);
+          }
+          else {
+            climb.runClimb(0.0);
+          }
 
-      case 5:
-        if(climb.getMainClimbPosition() > Constants.MIN_CLIMB_DISTANCE){
-          climb.runClimb(Constants.MAX_CLIMB_SPEED);
+          if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE * 2/3 && climb.getPivotMotorPosition() > 0){
+            climb.runPivotMotor(-0.2);
+          }
+          else {
+            climb.runPivotMotor(0.0);
+          }
+
+          if(joystick.START.isPressed()){ //add more constaints like mainClimbPosition and pivotMotorPosition?
+            climbStage = 1; 
+          }
         }
         break;
     }*/
@@ -443,39 +428,21 @@ public class Robot extends TimedRobot {
   }
 
   public void visionTargetPosition(){
-    /*if(vision_Area != 0){
+    /*float Kp = -0.006f;
+    float min_command = 0.03f;
+    if(vision_Area != 0){
+      float headingError = -(float)vision_X;
+      float steeringTurretAdust = 0.0f;
 
-      double visionSpeed = 0.03 * Math.pow(Math.abs(vision_X), 0.38);
+      if(headingError > 1.0){
+        steeringTurretAdust = Kp * headingError - min_command;
+      }
+      else if(headingError < 1.0){
+        steeringTurretAdust = Kp * headingError + min_command;
+      }
 
-      if(vision_X > 2){
-        turret.turn(visionSpeed);
-      }
-      else if(vision_X < 2){
-        turret.turn(-visionSpeed);
-      }
-      else {
-        turret.turn(0);
-      }
-    }
-    else {
-      turret.turn(0.0);
+      turret.turn(steeringTurretAdust);
     }*/
-
-    // float Kp = -0.006f;
-    // float min_command = 0.03f;
-    // if(vision_Area != 0){
-    //   float headingError = -(float)vision_X;
-    //   float steeringTurretAdust = 0.0f;
-
-    //   if(headingError > 1.0){
-    //     steeringTurretAdust = Kp * headingError - min_command;
-    //   }
-    //   else if(headingError < 1.0){
-    //     steeringTurretAdust = Kp * headingError + min_command;
-    //   }
-
-    //   turret.turn(steeringTurretAdust);
-    // }
 
     if(vision_Area != 0){
       turretTargetAngle = turret.getTurretAngle() + vision_X/10;
