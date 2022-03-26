@@ -71,7 +71,7 @@ public class Robot extends TimedRobot {
   int autoModeSelection;
 
   int climbStage;
-  int climbLevel;
+  boolean pivotRetracted;
 
   boolean runningIntake;
   double momentIntakeRetracted;
@@ -110,7 +110,7 @@ public class Robot extends TimedRobot {
     settingTurretPosition = false;
 
     climbStage = 0;
-    climbLevel = 0;
+    pivotRetracted = true;
 
     runningIntake = false;
     momentIntakeRetracted = 0.0;
@@ -329,45 +329,9 @@ public class Robot extends TimedRobot {
       shooter.stopShooter();
       shooter.retractHood();
     }
+    
 
-
-    if(joystick.A.isPressed()){
-      climb.runClimb(Constants.MAX_CLIMB_SPEED);  //Negative
-    }
-    else if(joystick.Y.isPressed()){
-      climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
-    }
-    else {
-      climb.runClimb(0.0);
-    }
-
-    if(joystick.X.isPressed()){
-      climb.runPivotMotor(0.2); //pivotSpeed
-    }
-    else if(joystick.B.isPressed()){
-      climb.runPivotMotor(-0.2); //pivotSpeed
-    }
-    else {
-      climb.runPivotMotor(0.0);
-    }
-
-    /*Climb:
-      driver raises climb + gets in position
-      presses button to start autonomous climb
-      
-      climb lowers to bar (main position = 0)
-      climb raises to 1/3 distance
-      pivots to max traverse angle
-      climb raises to max distance
-      pivots to min traverse angle
-      climb lowers to 2/3 distance
-      pivots return to 0
-      climb lowers to bar
-      repeat?
-
-    */
-
-    /*switch(climbStage){
+    switch(climbStage){
       case 0:
         if(joystick.Y.isPressed()){
           climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
@@ -379,51 +343,65 @@ public class Robot extends TimedRobot {
           climb.runClimb(0.0);
         }
 
-        if(joystick.START.isPressed()){ //add constraint for mainClimbPosition?
+        if(joystick.X.isPressed()){ 
           climbStage = 1;
         }
         break;
 
       case 1:
-        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
-          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE); //add if statement for pivotMotorPosition?
-
-          if(climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE/4 && climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE){
+        if(climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 2/3){
+          if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/4){
+            climb.runClimb(0.2);
+          }
+          else {
             climb.runPivotMotor(0.2);
           }
         }
         else {
-          climb.runClimb(0.0);
+          DriverStation.reportWarning("reached max pivot position", false);
           climb.runPivotMotor(0.0);
           climbStage = 2;
         }
         break;
-
       case 2:
-        if(drive.getGyroPitch() > -32.0 && climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE * 3/4){
+        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+        }
+        else {
+          climb.runClimb(0.0);
+          pivotRetracted = false;
+          climbStage = 3;
+        }
+        break;
+
+      case 3:
+        if(joystick.A.isPressed()){
+          climb.runClimb(-0.3);  //Negative
+        }
+        else if(joystick.Y.isPressed()){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
+        }
+        else {
+          climb.runClimb(0.0);
+        }
+    
+        if(joystick.X.isPressed()){
+          climb.runPivotMotor(0.2); //pivotSpeed
+        }
+        else if(joystick.B.isPressed()){
+          climb.runPivotMotor(-0.2); //pivotSpeed
+        }
+        else if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/2 && pivotRetracted == false && climb.getPivotMotorPosition() > 100){
           climb.runPivotMotor(-0.2);
         }
         else {
-          if(joystick.A.isPressed()){ //add constraint for pivotMotorPosition?
-            climb.runClimb(Constants.MAX_CLIMB_SPEED);
+          if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/2){
+            pivotRetracted = true;
           }
-          else {
-            climb.runClimb(0.0);
-          }
-
-          if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE * 2/3 && climb.getPivotMotorPosition() > 0){
-            climb.runPivotMotor(-0.2);
-          }
-          else {
-            climb.runPivotMotor(0.0);
-          }
-
-          if(joystick.START.isPressed()){ //add more constaints like mainClimbPosition and pivotMotorPosition?
-            climbStage = 1; 
-          }
+          climb.runPivotMotor(0.0);
         }
         break;
-    }*/
+    }
 
   }
 
