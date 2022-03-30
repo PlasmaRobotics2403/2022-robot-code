@@ -85,17 +85,14 @@ public class FollowTrajectory  implements Action{
             .addConstraint(
                 new DifferentialDriveVoltageConstraint(
                     new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter, kaVoltSecondSquaredPerMeter), 
-                    new DifferentialDriveKinematics(Constants.WHEEL_BASE), 11))
-            .setReversed(true);
+                    new DifferentialDriveKinematics(Constants.WHEEL_BASE), 11));
         trajectory1 = TrajectoryGenerator.generateTrajectory(
             // starting position
-            new Pose2d(0, 0, new Rotation2d(0)), 
-            // interior points
             List.of(
-                new Translation2d(-0.6, 0)
-            ),
-            // end position
-            new Pose2d(-1.016, 0, new Rotation2d(0)),
+                new Pose2d(0, 0, new Rotation2d(0)), 
+                new Pose2d(0.07, 0, new Rotation2d(Math.toRadians(-15))),
+                new Pose2d(0.1524, 0, new Rotation2d(Math.toRadians(-30)))
+                ),
             config1);
 
         trajectoryArray = new Trajectory[5];

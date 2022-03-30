@@ -385,10 +385,7 @@ public class Robot extends TimedRobot {
           climb.runClimb(0.0);
         }
     
-        if(joystick.X.isPressed()){
-          climb.runPivotMotor(0.2); //pivotSpeed
-        }
-        else if(joystick.B.isPressed()){
+        if(joystick.B.isPressed()){
           climb.runPivotMotor(-0.2); //pivotSpeed
         }
         else if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/2 && pivotRetracted == false && climb.getPivotMotorPosition() > 100){
@@ -399,6 +396,10 @@ public class Robot extends TimedRobot {
             pivotRetracted = true;
           }
           climb.runPivotMotor(0.0);
+        }
+
+        if(joystick.X.isPressed()){
+          climbStage = 1;
         }
         break;
     }
