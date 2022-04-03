@@ -191,11 +191,6 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Main Climb Position", climb.getMainClimbPosition());
     SmartDashboard.putNumber("Climb Pivot Position", climb.getPivotMotorPosition());
-
-
-    drive.updateOdometry();
-    SmartDashboard.putNumber("Pose X Test", drive.testX());
-    SmartDashboard.putNumber("Pose Y Test", drive.testY());
   }
 
   /**
@@ -297,6 +292,17 @@ public class Robot extends TimedRobot {
         intake.stopIndex();
       }
     }
+    else if(joystick.START.isPressed()){
+      shooter.spinFlyWheel(7500);
+      double errorValue = Math.abs(7500 - shooter.getShooterSpeed());
+      SmartDashboard.putNumber("shooter error", errorValue);
+      if(errorValue < 400 && Math.abs(vision_X) < 10){
+        intake.runIndex(Constants.INDEX_SPEED);
+      }
+      else {
+        intake.stopIndex();
+      }
+    }
     else if(joystick.LB.isPressed()){
       intake.extendIntake();
       intake.runIntake(-Constants.INTAKE_SPEED);
@@ -348,33 +354,43 @@ public class Robot extends TimedRobot {
         }
         break;
 
-      case 1:
-        if(climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 2/3){
-          if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/4){
-            climb.runClimb(0.2);
+        case 1:
+        if(climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 2/3 || climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+          
+          if(climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 1/3){
+            if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/4){
+              climb.runClimb(0.2);
+            }
+            else {
+              climb.runClimb(0.0);
+            }
+          }
+          else if (climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
+            climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
           }
           else {
-            climb.runPivotMotor(0.2);
+            climb.runClimb(0.0);
           }
+
+          if(climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE/4 && climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 2/3){
+            climb.runPivotMotor(0.4); //increase
+          }
+          else {
+            climb.runPivotMotor(0.0);
+          }
+
+
         }
         else {
           DriverStation.reportWarning("reached max pivot position", false);
           climb.runPivotMotor(0.0);
+          climb.runClimb(0.0);
+          pivotRetracted = false;
           climbStage = 2;
         }
         break;
-      case 2:
-        if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
-          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
-        }
-        else {
-          climb.runClimb(0.0);
-          pivotRetracted = false;
-          climbStage = 3;
-        }
-        break;
 
-      case 3:
+      case 2:
         if(joystick.A.isPressed()){
           climb.runClimb(-0.3);  //Negative
         }
@@ -386,7 +402,7 @@ public class Robot extends TimedRobot {
         }
     
         if(joystick.B.isPressed()){
-          climb.runPivotMotor(-0.2); //pivotSpeed
+          climb.runPivotMotor(-0.3); //pivotSpeed
         }
         else if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/2 && pivotRetracted == false && climb.getPivotMotorPosition() > 100){
           climb.runPivotMotor(-0.2);

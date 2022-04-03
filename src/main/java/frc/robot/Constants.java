@@ -68,7 +68,7 @@ public class Constants {
 
 	/* CLIMB CONSTANTS */
 	public static final double MAX_CLIMB_SPEED = -0.75;
-	public static final double MAX_CLIMB_DISTANCE = 492474; // 522895
+	public static final double MAX_CLIMB_DISTANCE = 467000; // 522895 //492474 //467634 //-7000?
 	public static final double MIN_CLIMB_DISTANCE = 1000; /// 7000
 	public static final double MAX_PIVOT_DISTANCE = 160183; //194117
 	public static final double MIN_PIVOT_DISTANCE = 0;

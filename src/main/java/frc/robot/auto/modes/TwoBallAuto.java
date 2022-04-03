@@ -54,7 +54,7 @@ public class TwoBallAuto extends AutoMode {
 		runAction(new FollowTrajectory(0, drive));
 		runAction(new RunIntake(intake, false));
 		runAction(new setTracking(turret, true));
-		runAction(new Shoot(shooter, intake, table, 4.0, 6.6));
+		runAction(new Shoot(shooter, intake, table, 4.0, 6.8));
 		runAction(new setTracking(turret, false));
 
 		DriverStation.reportWarning("Finished Action", false);
