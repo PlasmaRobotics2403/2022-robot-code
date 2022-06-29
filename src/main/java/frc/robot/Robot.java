@@ -305,12 +305,12 @@ public class Robot extends TimedRobot {
     }
     else if(joystick.LB.isPressed()){
       intake.extendIntake();
-      intake.runIntake(-Constants.INTAKE_SPEED);
+      intake.runIntake(-Constants.INTAKE_SPEED * Constants.EJECT_MULTIPLIER);
       intake.runKicker(-Constants.KICKER_SPEED);
     }
     else if(joystick.BACK.isPressed()){
       intake.extendIntake();
-      intake.runIntake(-Constants.INTAKE_SPEED);
+      intake.runIntake(-Constants.INTAKE_SPEED * Constants.EJECT_MULTIPLIER);
       intake.runKicker(-Constants.KICKER_SPEED);
       intake.runIndex(-Constants.INDEX_SPEED);
     }

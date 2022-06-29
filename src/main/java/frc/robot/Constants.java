@@ -49,9 +49,10 @@ public class Constants {
 	public static final double LOW_SHOT_SPEED = 4000;
 
 	/* INTAKE CONSTANTS */
-	public static final double INTAKE_SPEED = 0.5;
+	public static final double INTAKE_SPEED = 0.75;
 	public static final double KICKER_SPEED = 0.5;
 	public static final double INDEX_SPEED = 0.75;
+	public static final double EJECT_MULTIPLIER = 0.6;
 
 
 	/* TURRET CONSTANTS */
