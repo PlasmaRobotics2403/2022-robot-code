@@ -54,7 +54,7 @@ public class Constants {
 	public static final double ACCELERATOR_SPEED = 0.5;
 
 	/* INTAKE CONSTANTS */
-	public static final double INTAKE_SPEED = 0.5;
+	public static final double INTAKE_SPEED = 0.75;
 	public static final double KICKER_SPEED = 0.5;
 	public static final double INDEX_SPEED = 0.75;
 
