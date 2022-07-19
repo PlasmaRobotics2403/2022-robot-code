@@ -1,5 +1,7 @@
 package frc.robot;
 
+import javax.swing.undo.StateEdit;
+
 public class Constants {
     /* front of robot has electronics */
 	/* right & left sides from robot's perspective */
@@ -47,6 +49,7 @@ public class Constants {
 
 	/* SHOOTER CONSTANTS */
 	public static final double LOW_SHOT_SPEED = 4000;
+	public static final double LAUNCH_PAD_DISTANCE = 7.8;
 
 	/* INTAKE CONSTANTS */
 	public static final double INTAKE_SPEED = 0.75;
@@ -65,6 +68,7 @@ public class Constants {
 	public static final double LEFT_FACING = 90;
 	public static final double RIGHT_FACING = -90;
 	public static final double BACK_FACING = 180;
+	public static final double LAUNCH_PAD_ANGLE = -14;
 
 
 	/* CLIMB CONSTANTS */

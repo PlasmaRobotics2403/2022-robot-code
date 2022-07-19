@@ -282,9 +282,23 @@ public class Robot extends TimedRobot {
         }
       }
     }
+    /*  comment out low go shot to use button for launch pad shot
     else if(joystick.RB.isPressed()){
       shooter.spinFlyWheel(Constants.LOW_SHOT_SPEED);
       double errorValue = Math.abs(Constants.LOW_SHOT_SPEED - shooter.getShooterSpeed());
+      if(errorValue < 400){
+        intake.runIndex(Constants.INDEX_SPEED);
+      }
+      else {
+        intake.stopIndex();
+      }
+    }
+    */
+
+    else if(joystick.RB.isPressed()){
+      shooter.autoShoot(Constants.LAUNCH_PAD_DISTANCE);
+      turret.setTurretPosition(Constants.LAUNCH_PAD_ANGLE);
+      double errorValue = Math.abs(shooter.getTargetShootSpeed(distanceFromTarget) - shooter.getShooterSpeed());
       if(errorValue < 400){
         intake.runIndex(Constants.INDEX_SPEED);
       }
