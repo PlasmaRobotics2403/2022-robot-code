@@ -32,6 +32,7 @@ public class Constants {
 
 	/* PNUEMATIC CONSTANTS */
 	public static final int INTAKE_SOLENOID_CHANNEL = 0;
+	public static final int CLIMB_SOLENOID_CHANNEL = 1;
 	public static final int SHOOTER_SOLENOID_CHANNEL = 2;
 	
 
@@ -75,8 +76,15 @@ public class Constants {
 	public static final double MAX_CLIMB_SPEED = -0.75;
 	public static final double MAX_CLIMB_DISTANCE = 467000; // 522895 //492474 //467634 //-7000?
 	public static final double MIN_CLIMB_DISTANCE = 1000; /// 7000
+
+	public static final double MID_BAR_CLIMB_HIGHT = 363348;
+	public static final double TRAVERSING_CLIMB_HIGHT = 522895;
+
 	public static final double MAX_PIVOT_DISTANCE = 160183; //194117
 	public static final double MIN_PIVOT_DISTANCE = 0;
+
+	public static final double TRAVERSING_PIVOT_DISTANCE = 106790; // 2/3 MAX_PIVOT
+
 	public static final double MAX_TRAVERSE_ANGLE = -2; //gyro pitch
 	public static final double MIN_TRAVERSE_ANGLE = 0;
 
