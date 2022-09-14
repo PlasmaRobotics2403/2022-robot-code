@@ -47,11 +47,13 @@ public class Constants {
 
 	/* SHOOTER CONSTANTS */
 	public static final double LOW_SHOT_SPEED = 4000;
+	public static final double LAUNCH_PAD_SPEED = 9000;
 
 	/* INTAKE CONSTANTS */
 	public static final double INTAKE_SPEED = 0.5;
 	public static final double KICKER_SPEED = 0.5;
 	public static final double INDEX_SPEED = 0.75;
+	public static final double EJECT_MULTIPLIER = 0.6;
 
 
 	/* TURRET CONSTANTS */
@@ -64,10 +66,11 @@ public class Constants {
 	public static final double LEFT_FACING = 90;
 	public static final double RIGHT_FACING = -90;
 	public static final double BACK_FACING = 180;
+	public static final double LAUNCH_PAD_ANGLE = 20.2403;
 
 
 	/* CLIMB CONSTANTS */
-	public static final double MAX_CLIMB_SPEED = -0.75;
+	public static final double MAX_CLIMB_SPEED = -0.9;
 	public static final double MAX_CLIMB_DISTANCE = 467000; // 522895 //492474 //467634 //-7000?
 	public static final double MIN_CLIMB_DISTANCE = 1000; /// 7000
 	public static final double MAX_PIVOT_DISTANCE = 160183; //194117

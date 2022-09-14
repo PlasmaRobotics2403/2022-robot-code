@@ -87,7 +87,7 @@ public class Intake {
 
     public void advanceBall(){
         advanceBall ++;
-        indexMotor.set(ControlMode.Position, 600 * advanceBall);
+        indexMotor.set(ControlMode.Position, 800 * advanceBall); //600
 
         // if(isIndexing == false){
         //     advanceBall ++;
