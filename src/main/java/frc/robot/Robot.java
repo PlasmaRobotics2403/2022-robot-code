@@ -89,13 +89,14 @@ public class Robot extends TimedRobot {
     shooter = new Shooter(Constants.SHOOTER_MAIN_MOTOR_ID);
     intake = new Intake(Constants.INTAKE_ID, Constants.KICKER_ID, Constants.INDEX_ID, Constants.FRONT_INDEX_SENSOR_ID);
     turret = new Turret(Constants.TURRET_ID);
-    climb = new Climb(Constants.CLIMB_ID, Constants.CLIMB_PIVOT_ID, drive);
+    climb = new Climb(Constants.CLIMB_ID, Constants.CLIMB_PIVOT_ID, Constants.CLIMB_SOLENOID_CHANNEL, drive);
 
     compressor = new Compressor(PneumaticsModuleType.REVPH);
     pdh = new PowerDistribution(Constants.POWER_DISTRIBUTION_HUB, ModuleType.kRev);
 
     drive.zeroGyro();
-    
+    climb.openClaw();
+
     table = NetworkTableInstance.getDefault().getTable("limelight");
     tx = table.getEntry("tx");
     ty = table.getEntry("ty");
@@ -328,6 +329,12 @@ public class Robot extends TimedRobot {
       intake.runKicker(-Constants.KICKER_SPEED);
       intake.runIndex(-Constants.INDEX_SPEED);
     }
+    else if(joystick.L3.isPressed()){
+      climb.openClaw();
+    }
+    else if(joystick.R3.isPressed()){
+      climb.closeClaw();
+    }
     else{
       if(Timer.getFPGATimestamp() <= momentIntakeRetracted + 1){
         intake.runIntake(Constants.INTAKE_SPEED);
@@ -365,6 +372,7 @@ public class Robot extends TimedRobot {
         }
 
         if(joystick.X.isPressed()){ 
+          climb.openClaw();
           climbStage = 1;
         }
         break;

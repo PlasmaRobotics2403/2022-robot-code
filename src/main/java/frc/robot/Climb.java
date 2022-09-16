@@ -7,18 +7,23 @@ import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
+
 public class Climb {
 
     TalonFX climbMotor;
-    TalonFX pivotMotor; 
+    TalonFX pivotMotor;
+    
+    Solenoid claw;
 
     Drive drive;
 
-    public Climb(final int climbMotorID, final int pivotMotorID, Drive drive){
+    public Climb(final int climbMotorID, final int pivotMotorID, final int clawID, Drive drive){
         this.drive = drive;
         climbMotor = new WPI_TalonFX(climbMotorID);
         pivotMotor = new WPI_TalonFX(pivotMotorID);
-
+        claw = new Solenoid(Constants.PNUEMATIC_HUB_ID, PneumaticsModuleType.REVPH, clawID);
 
         climbMotor.setInverted(true);
         climbMotor.setNeutralMode(NeutralMode.Brake);
@@ -49,7 +54,6 @@ public class Climb {
         pivotMotor.config_IntegralZone(0, 30, 300);
 
         currentLimit(pivotMotor);
-
     }
 
 
@@ -117,5 +121,13 @@ public class Climb {
 
     public void currentLimit(final TalonFX talon) {
         talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30,0));
-      }
+    }
+
+    public void openClaw() {
+        claw.set(false);
+    }
+
+    public void closeClaw() {
+        claw.set(true);
+    }
 }
