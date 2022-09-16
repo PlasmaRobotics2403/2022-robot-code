@@ -93,7 +93,6 @@ public class Constants {
 	public static final double MIN_TRAVERSE_ANGLE = 0;
 
 
-
 	/* VISION CONSTANTS */
 	public static final double CAMERA_HEIGHT = 41.5; //inches
 	public static final double CAMERA_ANGLE = 48.6; //degrees  //limelight angle = 90 - 48.6 = 41.4

@@ -608,8 +608,6 @@ public class Robot extends TimedRobot {
     else {
       turret.turn(0.0);
     }
-    
-
   }
 
   public void visionControls(PlasmaJoystick joystick){

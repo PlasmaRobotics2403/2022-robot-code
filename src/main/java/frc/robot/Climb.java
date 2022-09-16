@@ -135,10 +135,6 @@ public class Climb {
         claw.set(false);
     }
 
-    /**
-     * 
-     * @return
-     */
     public boolean getClawState() {
         return claw.get();
     }
