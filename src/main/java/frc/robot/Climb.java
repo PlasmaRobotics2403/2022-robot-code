@@ -119,15 +119,27 @@ public class Climb {
         }
     }
 
+    /**
+     * 
+     * @param talon
+     */
     public void currentLimit(final TalonFX talon) {
         talon.configSupplyCurrentLimit(new SupplyCurrentLimitConfiguration(true, 30, 30,0));
     }
 
     public void openClaw() {
-        claw.set(false);
+        claw.set(true);
     }
 
     public void closeClaw() {
-        claw.set(true);
+        claw.set(false);
+    }
+
+    /**
+     * 
+     * @return
+     */
+    public boolean getClawState() {
+        return claw.get();
     }
 }
