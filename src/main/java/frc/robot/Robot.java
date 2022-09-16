@@ -95,7 +95,6 @@ public class Robot extends TimedRobot {
     pdh = new PowerDistribution(Constants.POWER_DISTRIBUTION_HUB, ModuleType.kRev);
 
     drive.zeroGyro();
-    climb.openClaw();
 
     table = NetworkTableInstance.getDefault().getTable("limelight");
     tx = table.getEntry("tx");
@@ -111,7 +110,7 @@ public class Robot extends TimedRobot {
     settingTurretPosition = false;
 
     climbStage = 0;
-    pivotRetracted = true;
+    pivotRetracted = false;
 
     runningIntake = false;
     momentIntakeRetracted = 0.0;
@@ -244,6 +243,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     compressor.enableDigital();
     turret.setTurretPosition(Constants.FORWARD_FACING);
+    climb.openClaw();
   }
 
   /** This function is called periodically during operator control. */
@@ -300,7 +300,7 @@ public class Robot extends TimedRobot {
       shooter.spinFlyWheel(Constants.LAUNCH_PAD_SPEED);
       shooter.extendHood();
       double errorValue = Math.abs(Constants.LAUNCH_PAD_SPEED - shooter.getShooterSpeed());
-      if(errorValue < 400 /*&& Math.abs(turretTargetAngle-Constants.LAUNCH_PAD_ANGLE) < 10*/){
+      if(errorValue < 400){
         intake.runIndex(Constants.INDEX_SPEED);
       }
       else {
@@ -329,12 +329,6 @@ public class Robot extends TimedRobot {
       intake.runKicker(-Constants.KICKER_SPEED);
       intake.runIndex(-Constants.INDEX_SPEED);
     }
-    else if(joystick.L3.isPressed()){
-      climb.openClaw();
-    }
-    else if(joystick.R3.isPressed()){
-      climb.closeClaw();
-    }
     else{
       if(Timer.getFPGATimestamp() <= momentIntakeRetracted + 1){
         intake.runIntake(Constants.INTAKE_SPEED);
@@ -357,15 +351,15 @@ public class Robot extends TimedRobot {
       shooter.retractHood();
     }
     
-    
+    /* ORIGINAL CLIMB CODE */
+    /*
     switch(climbStage){
-      case 0: 
+      case 0:
         if(joystick.Y.isPressed()){
-          climb.setClimbPosition(444000); //extends climb
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
         }
         else if(joystick.A.isPressed()){
-          //climb.runClimb(Constants.MAX_CLIMB_SPEED); //retracts climb
-          climb.setClimbPosition(Constants.MIN_CLIMB_DISTANCE);
+          climb.runClimb(Constants.MAX_CLIMB_SPEED);
         }
         else {
           climb.runClimb(0.0);
@@ -377,26 +371,26 @@ public class Robot extends TimedRobot {
         }
         break;
 
-        case 1: 
+        case 1:
         if(climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 2/3 || climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
           
           if(climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 1/3){
             if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/4){
-              climb.runClimb(0.3); //starts extending climb, speed lower to keep from bouncing off bar 
+              climb.runClimb(0.5);
             }
             else {
               climb.runClimb(0.0);
             }
           }
           else if (climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE){
-            climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE); //finish extending climb
+            climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
           }
           else {
             climb.runClimb(0.0);
           }
 
           if(climb.getMainClimbPosition() > Constants.MAX_CLIMB_DISTANCE/4 && climb.getPivotMotorPosition() < Constants.MAX_PIVOT_DISTANCE * 2/3){
-            climb.runPivotMotor(0.4); //extends pivot arms
+            climb.runPivotMotor(0.6); //increase
           }
           else {
             climb.runPivotMotor(0.0);
@@ -415,21 +409,20 @@ public class Robot extends TimedRobot {
 
       case 2:
         if(joystick.A.isPressed()){
-          climb.runClimb(-0.9);  //Negative //retracts climb
+          climb.runClimb(-0.3);  //Negative
         }
-        else if(joystick.Y.isPressed() /*&& climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE*/){
-          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE); //extends climb
-          //climb.runClimb(0.3);
+        else if(joystick.Y.isPressed()){
+          climb.setClimbPosition(Constants.MAX_CLIMB_DISTANCE);
         }
         else {
           climb.runClimb(0.0);
         }
     
         if(joystick.B.isPressed()){
-          climb.runPivotMotor(-0.5); //pivotSpeed //retracts pivot arms for positioning
+          climb.runPivotMotor(-0.3); //pivotSpeed
         }
         else if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/2 && pivotRetracted == false && climb.getPivotMotorPosition() > 100){
-          climb.runPivotMotor(-0.5); //finish retracting after driver starts to climb
+          climb.runPivotMotor(-0.2);
         }
         else {
           if(climb.getMainClimbPosition() < Constants.MAX_CLIMB_DISTANCE/2){
@@ -442,6 +435,145 @@ public class Robot extends TimedRobot {
           climbStage = 1;
         }
         break;
+    }
+    */
+
+    /* ALEX'S MODIFIED CLIMB */
+    /**
+     * @param climbstage represents what bar robot is hanging on
+     */
+    switch(climbStage) {
+      case 0:   // robot on ground
+        if(joystick.Y.isPressed()) {
+          climb.setClimbPosition(Constants.MID_BAR_CLIMB_HIGHT);
+        }
+        else if(joystick.A.isPressed()){
+          climb.runClimb(Constants.MAX_CLIMB_SPEED);
+        }
+        else {
+          climb.runClimb(0.0);
+        }
+
+        // lock onto bar and advance to next stage
+        if(joystick.X.isPressed()) { 
+          climb.closeClaw();
+          climbStage++;
+        }
+      break;
+
+      case 1:   // robot is hanging on mid bar
+        // release pivot hook from bar before climbing
+        if(climb.getMainClimbPosition() < Constants.RELEASE_CLIMB_HOOK_HEIGHT && !pivotRetracted) {
+          climb.runClimb(0.25);
+        }
+        else {
+          // retract climb and pivot
+          if(pivotRetracted) {
+            // started pulling on high bar, can open claws
+            if(climb.getMainClimbPosition() < Constants.OPEN_CLAW_HEIGHT) {
+              climb.openClaw();
+            }
+
+            if(joystick.B.isPressed()) {
+              climb.runPivotMotor(Constants.PIVOT_RETRACT_SPEED);
+            }
+            else if(climb.getClawState()) {
+              climb.runPivotMotor(Constants.PIVOT_RETRACT_SPEED);
+            }
+            else {
+              climb.runPivotMotor(0.0);
+            }
+
+            if(joystick.A.isPressed()) {
+              climb.runClimb(Constants.MAX_CLIMB_SPEED);
+            }
+            else if(joystick.Y.isPressed()) {
+              climb.runClimb(Constants.MAX_CLIMB_SPEED * -1);
+            }
+            else {
+              climb.runClimb(0.0);
+            }
+
+            // lock onto bar and advance to next stage
+            if(joystick.X.isPressed()){ 
+              climb.closeClaw();
+              climbStage++;
+              pivotRetracted = false;
+            }
+          }
+          // climb is ready to retract
+          else if(climb.getPivotMotorPosition() > Constants.TRAVERSING_PIVOT_DISTANCE && climb.getMainClimbPosition() > Constants.TRAVERSING_CLIMB_HIGHT) {
+            pivotRetracted = true;
+          }
+          // is it safe to run climb up?
+          else if(climb.getPivotMotorPosition() > Constants.TRAVERSING_PIVOT_DISTANCE) {
+            climb.setClimbPosition(Constants.TRAVERSING_CLIMB_HIGHT);
+            climb.runPivotMotor(0.0);
+          }
+          // pivot to safe distance to run climb up
+          else {
+            climb.runPivotMotor(Constants.MAX_PIVOT_SPEED);
+            climb.runClimb(0.0);
+          }
+        }
+      break;
+
+      case 2:   // robot is hanging on high bar
+        // release pivot hook from bar before climbing
+        if(climb.getMainClimbPosition() < Constants.RELEASE_CLIMB_HOOK_HEIGHT && !pivotRetracted) {
+          climb.runClimb(0.25);
+        }
+        else {
+          // retract climb and pivot
+          if(pivotRetracted) {
+            // started pulling on traversal bar, can open claws
+            if(climb.getMainClimbPosition() < Constants.OPEN_CLAW_HEIGHT) {
+              climb.openClaw();
+            } 
+
+            if(joystick.B.isPressed()) {
+              climb.runPivotMotor(Constants.PIVOT_RETRACT_SPEED);
+            }
+            else if(climb.getClawState()) {
+              climb.runPivotMotor(Constants.PIVOT_RETRACT_SPEED);
+            }
+            else {
+              climb.runPivotMotor(0.0);
+            }
+
+            if(joystick.A.isPressed()) {
+              climb.runClimb(Constants.MAX_CLIMB_SPEED);
+            }
+            else if(joystick.Y.isPressed()) {
+              climb.runClimb(Constants.MAX_CLIMB_SPEED * -1);
+            }
+            else {
+              climb.runClimb(0.0);
+            }
+
+            // lock onto bar and advance to next stage
+            if(joystick.X.isPressed()){ 
+              climb.closeClaw();
+              climbStage++;
+              pivotRetracted = false;
+            }
+          }
+          // climb is ready to retract
+          else if(climb.getPivotMotorPosition() > Constants.TRAVERSING_PIVOT_DISTANCE && climb.getMainClimbPosition() > Constants.TRAVERSING_CLIMB_HIGHT) {
+            pivotRetracted = true;
+          }
+          // is it safe to run climb up?
+          else if(climb.getPivotMotorPosition() > Constants.TRAVERSING_PIVOT_DISTANCE) {
+            climb.setClimbPosition(Constants.TRAVERSING_CLIMB_HIGHT);
+            climb.runPivotMotor(0.0);
+          }
+          // pivot to safe distance to run climb up
+          else {
+            climb.runPivotMotor(Constants.MAX_PIVOT_SPEED);
+            climb.runClimb(0.0);
+          }
+        }
+      break;
     }
 
   }
@@ -464,9 +596,9 @@ public class Robot extends TimedRobot {
     }*/
 
     if(vision_Area != 0){
-      turretTargetAngle = turret.getTurretAngle() + vision_X/10;
+      turretTargetAngle = turret.getTurretAngle() + vision_X/3;
       if(Math.abs(vision_X) > 3){
-        turretTargetAngle = turret.getTurretAngle() + vision_X/10;
+        turretTargetAngle = turret.getTurretAngle() + vision_X/3;
         turret.setTurretPosition(turretTargetAngle);
       }
       else{
@@ -476,16 +608,10 @@ public class Robot extends TimedRobot {
     else {
       turret.turn(0.0);
     }
-    
-
   }
 
   public void visionControls(PlasmaJoystick joystick){
-    if(joystick.RB.isPressed()){
-      turretTargetAngle = Constants.LAUNCH_PAD_ANGLE;
-      settingTurretPosition = true;
-    }
-    else if(joystick.dPad.getPOV() == 0){
+    if(joystick.dPad.getPOV() == 0){
       turretTargetAngle = Constants.FORWARD_FACING;
       settingTurretPosition = true;
     }
@@ -519,11 +645,15 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when the robot is disabled. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+    climb.closeClaw();
+  }
 
   /** This function is called periodically when disabled. */
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    climb.closeClaw();
+  }
 
   /** This function is called once when test mode is enabled. */
   @Override
@@ -531,5 +661,16 @@ public class Robot extends TimedRobot {
 
   /** This function is called periodically during test mode. */
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    if(joystick.B.isPressed()) {
+      climb.runPivotMotor(Constants.MAX_PIVOT_SPEED);
+    }
+    else if(joystick.X.isPressed()) {
+      climb.runPivotMotor(Constants.PIVOT_RETRACT_SPEED);
+    }
+    else {
+      climb.runPivotMotor(0.0);
+    }
+  }
 }
+
