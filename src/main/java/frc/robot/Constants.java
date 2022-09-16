@@ -79,11 +79,16 @@ public class Constants {
 
 	public static final double MID_BAR_CLIMB_HIGHT = 363348;
 	public static final double TRAVERSING_CLIMB_HIGHT = 522895;
+	public static final double RELEASE_CLIMB_HOOK_HEIGHT = 116750; // 1/4 MAX_CLIMB
+	public static final double OPEN_CLAW_HEIGHT = 490000;  // trial number
 
+	public static final double MAX_PIVOT_SPEED = 0.6;
+	public static final double PIVOT_RETRACT_SPEED = -0.3;
 	public static final double MAX_PIVOT_DISTANCE = 160183; //194117
 	public static final double MIN_PIVOT_DISTANCE = 0;
 
 	public static final double TRAVERSING_PIVOT_DISTANCE = 106790; // 2/3 MAX_PIVOT
+	public static final double RUNG_CLEARANCE_PIVOT_DISTANCE = 53394; // 1/3 MAX_PIVOT  distance to start extending climb
 
 	public static final double MAX_TRAVERSE_ANGLE = -2; //gyro pitch
 	public static final double MIN_TRAVERSE_ANGLE = 0;
