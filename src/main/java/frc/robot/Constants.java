@@ -50,7 +50,7 @@ public class Constants {
 
 	/* SHOOTER CONSTANTS */
 	public static final double LOW_SHOT_SPEED = 4000;
-	public static final double LAUNCH_PAD_SPEED = 9000;
+	public static final double LAUNCH_PAD_SPEED = 8700; //was 9000
 
 	/* INTAKE CONSTANTS */
 	public static final double INTAKE_SPEED = 0.75;
@@ -62,7 +62,7 @@ public class Constants {
 	/* TURRET CONSTANTS */
 	public static final int MAX_LIMIT_DISTANCE = 30700; ///
 	public static final int MIN_LIMIT_DISTANCE = -10300; /// -10476
-	public static final double TURRET_SPEED = 0.5;
+	public static final double TURRET_SPEED = 0.7; //was 0.5
 	public static final int ENCODER_TICKS_PER_ROTATION = 40800;
 
 	public static final double FORWARD_FACING = 0;
@@ -77,7 +77,7 @@ public class Constants {
 	public static final double MAX_CLIMB_DISTANCE = 467000; // 522895 //492474 //467634 //-7000?
 	public static final double MIN_CLIMB_DISTANCE = 5000; /// 7000
 
-	public static final double MID_BAR_CLIMB_HIGHT = 403348;
+	public static final double MID_BAR_CLIMB_HIGHT = 435000; //was 403348
 	public static final double TRAVERSING_CLIMB_HIGHT = 467000;
 	public static final double RELEASE_CLIMB_HOOK_HEIGHT = 86750; // 1/4 MAX_CLIMB
 	public static final double OPEN_CLAW_HEIGHT = 430000;  // trial number

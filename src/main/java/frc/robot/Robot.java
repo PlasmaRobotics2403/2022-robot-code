@@ -299,6 +299,8 @@ public class Robot extends TimedRobot {
     else if(joystick.RB.isPressed()){
       shooter.spinFlyWheel(Constants.LAUNCH_PAD_SPEED);
       shooter.extendHood();
+      turretTargetAngle = Constants.LAUNCH_PAD_ANGLE; //added by Nick
+      settingTurretPosition = true; //added by Nick
       double errorValue = Math.abs(Constants.LAUNCH_PAD_SPEED - shooter.getShooterSpeed());
       if(errorValue < 400){
         intake.runIndex(Constants.INDEX_SPEED);
